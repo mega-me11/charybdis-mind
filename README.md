@@ -1,8 +1,17 @@
 # Cyclone Impact Forecaster
 
+**Team PromptForge
+
 **An AI-powered disaster decision-support system for understanding, predicting, and responding to cyclone-related impacts on people, roads, and critical infrastructure before and during landfall.**
 
 Cyclone Impact Forecaster combines **Google Earth Engine geospatial intelligence, machine learning, disaster-aware routing, Google Gemini, and an interactive cyclone timeline** to transform environmental and infrastructure data into actionable disaster insights.
+
+## Demo
+
+Live demo: [link]
+
+Demo video: [link]
+
 
 ---
 
@@ -389,13 +398,13 @@ The timeline architecture is designed so that sample cyclone data can eventually
 
 
 
-# 👩‍💻 Team
+# 👩‍💻 Team PromptForge
 
 ### Megha Chatterjee : Team Lead - Geospatial Intelligence • Machine Learning • Routing • Backend • AI Integration • Human Feedback**
 
-### Jaspreet Kaur — Cyclone Timeline & Map Interaction
+### Jaspreet Kaur — Cyclone Timeline •  Map Interaction • Unified Dashboard UI
 
-### Ekta Bokaria — Ground Infrastructure & Map Layers
+### Ekta Bokaria — Ground Infrastructure • Map Layers • Unified Dashboard UI
 
 ### Shreya Ranjan — Presentation & Demonstration
 
