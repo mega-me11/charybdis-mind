@@ -1,0 +1,92 @@
+CYCLONE IMPACT & INFRASTRUCTURE VULNERABILITY FORECASTER
+AI-GENERATED DISASTER ADVISORY
+==========================================================
+
+FORECAST SUMMARY
+----------------
+
+The forecasting pipeline evaluated 2,560 prediction locations
+within the study region using environmental and geospatial
+features including:
+
+- Distance to coast
+- Elevation
+- Population density
+- Rainfall
+- Slope
+
+A Random Forest model was used to estimate flood probability.
+
+RISK DISTRIBUTION
+-----------------
+
+High Risk:       49 locations
+Moderate Risk:   574 locations
+Low Risk:        1,937 locations
+
+Mean flood probability:    0.1635
+Maximum flood probability: 0.5267
+
+High-risk classification threshold: 0.35
+
+INFRASTRUCTURE EXPOSURE
+-----------------------
+
+Road network evaluated: 87,306 road features
+
+Roads within 5 km of high-risk locations:
+5,519 roads
+
+Road exposure:
+6.32%
+
+Power infrastructure evaluated:
+39,168 features
+
+Power infrastructure within 5 km of high-risk locations:
+553 features
+
+Breakdown:
+- Power-grid infrastructure: 552
+- Power plants: 1
+
+Power infrastructure exposure:
+1.41%
+
+PRIORITY ACTIONS
+----------------
+
+1. Prioritize monitoring and preparedness in locations classified
+   as high flood risk.
+
+2. Identify roads near high-risk areas for potential disruption
+   and emergency route planning.
+
+3. Prioritize inspection and contingency planning for exposed
+   power-grid infrastructure.
+
+4. Use the risk map together with cyclone trajectory and
+   time-dependent routing to support disaster-response planning.
+
+5. Continuously compare model-based predictions with observed
+   conditions as new information becomes available.
+
+MODEL LIMITATIONS
+-----------------
+
+The flood-risk values represent model-derived estimates and
+proximity-based infrastructure exposure.
+
+They should not be interpreted as proof that a specific road,
+power asset, or location will actually flood or be damaged.
+
+The current prototype does not provide a physically simulated
+storm-surge model, and infrastructure exposure is based on
+spatial proximity to predicted high-risk areas.
+
+The risk thresholds are prototype/model-derived thresholds and
+have not been calibrated as operational disaster-warning
+thresholds.
+
+The system is intended as a decision-support prototype rather
+than an official emergency-warning system.
