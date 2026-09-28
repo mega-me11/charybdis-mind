@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import json
 import joblib
+import pandas as pd
+from pydantic import BaseModel
 
 app = FastAPI(
     title="Cyclone Impact Forecaster API",
@@ -33,6 +35,32 @@ def load_json(filename):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
+class PredictionInput(BaseModel):
+    elevation: float
+    distance_to_coast: float
+    rainfall: float
+    population: float
+    slope: float
+
+
+@app.post("/predict")
+def predict(input_data: PredictionInput):
+    features = pd.DataFrame([{
+        "elevation": input_data.elevation,
+        "distance_to_coast": input_data.distance_to_coast,
+        "rainfall": input_data.rainfall,
+        "population": input_data.population,
+        "slope": input_data.slope
+    }])
+
+    prediction = int(model.predict(features)[0])
+    probability = float(model.predict_proba(features)[0][1])
+
+    return {
+        "risk_class": prediction,
+        "flood_probability": probability
+    }
 
 @app.get("/")
 def root():
