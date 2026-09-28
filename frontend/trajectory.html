@@ -312,14 +312,20 @@
       </div>
 
       <!-- Landfall Alert Box -->
-      <div class="p-3.5 rounded-xl bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent border border-red-500/35">
-        <div class="text-[10px] font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
-          <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Expected Landfall
-        </div>
-        <div class="text-sm font-bold text-white mt-1 font-mono-code" id="panel-landfall-timer">
-          IN ~12 HOURS (ODISHA / WB COAST)
-        </div>
-      </div>
+      <!-- AI Disaster Advisory -->
+  <div class="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30">
+    <div class="text-[10px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+      <i data-lucide="brain" class="w-3.5 h-3.5"></i>
+      AI DISASTER ADVISORY
+    </div>
+
+    <div
+      id="ai-advisory"
+      class="text-xs text-slate-300 mt-2 leading-relaxed max-h-24 overflow-y-auto"
+    >
+      Loading advisory...
+    </div>
+  </div>
 
       <!-- Realtime Wind Speed Sparkline Canvas -->
       <div class="glass-card p-3 rounded-xl">
@@ -1082,6 +1088,62 @@
       }
     });
 
+    /* =========================================================================
+   7. BACKEND INTEGRATION
+   ========================================================================= */
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+async function loadBackendData() {
+  try {
+    // Load disaster-aware routing data
+    const routingResponse = await fetch(`${API_BASE_URL}/routing`);
+
+    if (!routingResponse.ok) {
+      throw new Error(`Routing API returned ${routingResponse.status}`);
+    }
+
+    const routingData = await routingResponse.json();
+
+    console.log("Routing data loaded:", routingData);
+
+    // Load Gemini advisory
+    const advisoryResponse = await fetch(`${API_BASE_URL}/advisory`);
+
+    if (!advisoryResponse.ok) {
+      throw new Error(`Advisory API returned ${advisoryResponse.status}`);
+    }
+
+    const advisoryData = await advisoryResponse.json();
+
+    console.log("Gemini advisory loaded:", advisoryData);
+
+    const advisoryElement = document.getElementById("ai-advisory");
+
+    if (advisoryElement) {
+      advisoryElement.textContent =
+        advisoryData.advisory || "No advisory available.";
+    }
+
+    appendLog("Backend routing data synchronized.", true);
+    appendLog("Gemini disaster advisory synchronized.", true);
+
+  } catch (error) {
+    console.error("Backend integration error:", error);
+
+    const advisoryElement = document.getElementById("ai-advisory");
+
+    if (advisoryElement) {
+      advisoryElement.textContent =
+        "Backend connection unavailable.";
+    }
+
+    appendLog(`Backend connection error: ${error.message}`, true);
+  }
+}
+
+loadBackendData();
+    
     // Initialize Lucide icons
     lucide.createIcons();
   </script>
