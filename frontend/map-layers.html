@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cyclone Impact Forecaster</title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+        }
+
+        header {
+            height: 65px;
+            background: #0b1f33;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 21px;
+        }
+
+        header span {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 65px);
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 270px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.12);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .layer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 5px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .layer input {
+            width: 17px;
+            height: 17px;
+        }
+
+        .layer-icon {
+            width: 25px;
+            text-align: center;
+        }
+
+        .timeline {
+            margin-top: 30px;
+        }
+
+        .timeline h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        #timeSlider {
+            width: 100%;
+        }
+
+        #timeDisplay {
+            margin-top: 10px;
+            padding: 10px;
+            background: #eef3f7;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .map-area {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .info-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 999;
+            width: 210px;
+        }
+
+        .info-box h3 {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .info-box p {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            background: #fff3cd;
+            font-size: 12px;
+        }
+
+        @media(max-width: 700px) {
+            .sidebar {
+                width: 210px;
+            }
+
+            header h1 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌪️ Cyclone Impact Forecaster</h1>
+    <span>Track Based Infrastructure Vulnerability</span>
+</header>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h2>Map Layers</h2>
+
+        <label class="layer">
+            <input type="checkbox" id="roadsToggle" checked>
+            <span class="layer-icon">🛣️</span>
+            Roads
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="hospitalToggle" checked>
+            <span class="layer-icon">🏥</span>
+            Hospitals
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="shelterToggle" checked>
+            <span class="layer-icon">🏠</span>
+            Emergency Shelters
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="powerToggle" checked>
+            <span class="layer-icon">⚡</span>
+            Power Infrastructure
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="waterToggle" checked>
+            <span class="layer-icon">💧</span>
+            Water Facilities
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="coastToggle" checked>
+            <span class="layer-icon">🌊</span>
+            Coastline
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="populationToggle">
+            <span class="layer-icon">👥</span>
+            Population
+        </label>
+
+        <label class="layer">
+            <input type="checkbox" id="cycloneToggle" checked>
+            <span class="layer-icon">🌀</span>
+            Cyclone Track
+        </label>
+
+        <!-- TIMELINE -->
+
+        <div class="timeline">
+
+            <h3>🕒 Cyclone Timeline</h3>
+
+            <input
+                type="range"
+                id="timeSlider"
+                min="0"
+                max="4"
+                value="0"
+                step="1"
+            >
+
+            <div id="timeDisplay">
+                12:00 PM
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAP -->
+
+    <div class="map-area">
+
+        <div id="map"></div>
+
+        <div class="info-box">
+
+            <h3>🌪️ Cyclone Status</h3>
+
+            <p>
+                <b>System:</b> Cyclone Demo
+            </p>
+
+            <p>
+                <b>Wind:</b> 120 km/h
+            </p>
+
+            <p>
+                <b>Movement:</b> NE
+            </p>
+
+            <div class="status">
+                ⚠️ Monitoring active
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Leaflet JS -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script>
+
+    /* =========================================
+       MAP INITIALIZATION
+    ========================================= */
+
+    const map = L.map("map").setView([20.3, 85.8], 7);
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution: "&copy; OpenStreetMap contributors"
+        }
+    ).addTo(map);
+
+
+    /* =========================================
+       LAYER GROUPS
+    ========================================= */
+
+    const roadsLayer = L.layerGroup();
+    const hospitalsLayer = L.layerGroup();
+    const sheltersLayer = L.layerGroup();
+    const powerLayer = L.layerGroup();
+    const waterLayer = L.layerGroup();
+    const coastlineLayer = L.layerGroup();
+    const populationLayer = L.layerGroup();
+    const cycloneLayer = L.layerGroup();
+
+
+    /* =========================================
+       ROADS
+    ========================================= */
+
+    const roads = [
+
+        [
+            [20.30, 85.82],
+            [20.45, 86.00],
+            [20.60, 86.20]
+        ],
+
+        [
+            [20.10, 85.70],
+            [20.25, 85.90],
+            [20.50, 86.10]
+        ],
+
+        [
+            [20.70, 85.60],
+            [20.50, 85.80],
+            [20.30, 86.00]
+        ]
+
+    ];
+
+    roads.forEach(function(road) {
+
+        L.polyline(
+            road,
+            {
+                weight: 5,
+                opacity: 0.8
+            }
+        )
+        .bindPopup("Major Road")
+        .addTo(roadsLayer);
+
+    });
+
+
+    /* =========================================
+       HOSPITALS
+    ========================================= */
+
+    const hospitals = [
+
+        [20.2961, 85.8245, "Bhubaneswar Hospital"],
+
+        [20.4625, 85.8830, "Cuttack Hospital"],
+
+        [19.8135, 85.8312, "Puri Hospital"]
+
+    ];
+
+    hospitals.forEach(function(hospital) {
+
+        L.marker(
+            [hospital[0], hospital[1]]
+        )
+        .bindPopup(
+            "<b>🏥 Hospital</b><br>" +
+            hospital[2]
+        )
+        .addTo(hospitalsLayer);
+
+    });
+
+
+    /* =========================================
+       EMERGENCY SHELTERS
+    ========================================= */
+
+    const shelters = [
+
+        [20.25, 85.75, "Emergency Shelter A"],
+
+        [20.42, 85.95, "Emergency Shelter B"],
+
+        [19.95, 85.82, "Emergency Shelter C"]
+
+    ];
+
+    shelters.forEach(function(shelter) {
+
+        L.marker(
+            [shelter[0], shelter[1]]
+        )
+        .bindPopup(
+            "<b>🏠 Emergency Shelter</b><br>" +
+            shelter[2]
+        )
+        .addTo(sheltersLayer);
+
+    });
+
+
+    /* =========================================
+       POWER INFRASTRUCTURE
+    ========================================= */
+
+    const powerStations = [
+
+        [20.35, 85.85, "Power Substation 1"],
+
+        [20.55, 86.05, "Power Substation 2"],
+
+        [20.05, 85.95, "Power Substation 3"]
+
+    ];
+
+    powerStations.forEach(function(power) {
+
+        L.marker(
+            [power[0], power[1]]
+        )
+        .bindPopup(
+            "<b>⚡ Power Infrastructure</b><br>" +
+            power[2]
+        )
+        .addTo(powerLayer);
+
+    });
+
+
+    /* =========================================
+       WATER FACILITIES
+    ========================================= */
+
+    const waterFacilities = [
+
+        [20.32, 85.78, "Water Treatment Plant"],
+
+        [20.48, 85.92, "Water Facility"],
+
+        [20.15, 85.88, "Water Pumping Station"]
+
+    ];
+
+    waterFacilities.forEach(function(water) {
+
+        L.marker(
+            [water[0], water[1]]
+        )
+        .bindPopup(
+            "<b>💧 Water Facility</b><br>" +
+            water[2]
+        )
+        .addTo(waterLayer);
+
+    });
+
+
+    /* =========================================
+       COASTLINE
+    ========================================= */
+
+    const coastline = [
+
+        [20.70, 86.70],
+        [20.50, 86.65],
+        [20.30, 86.60],
+        [20.10, 86.55],
+        [19.90, 86.50],
+        [19.70, 86.45]
+    ];
+
+    L.polyline(
+        coastline,
+        {
+            weight: 4,
+            dashArray: "8,8"
+        }
+    )
+    .bindPopup("Coastline")
+    .addTo(coastlineLayer);
+
+
+    /* =========================================
+       POPULATION
+    ========================================= */
+
+    const populationAreas = [
+
+        [20.30, 85.82, 900000],
+
+        [20.46, 85.88, 700000],
+
+        [19.81, 85.83, 250000]
+
+    ];
+
+    populationAreas.forEach(function(area) {
+
+        L.circle(
+            [area[0], area[1]],
+            {
+                radius: 12000,
+                fillOpacity: 0.25,
+                weight: 1
+            }
+        )
+        .bindPopup(
+            "<b>👥 Population Area</b><br>" +
+            "Estimated population: " +
+            area[2].toLocaleString()
+        )
+        .addTo(populationLayer);
+
+    });
+
+
+    /* =========================================
+       CYCLONE TRACK
+    ========================================= */
+
+    const cyclonePositions = [
+
+        [18.80, 88.20],
+
+        [19.10, 87.70],
+
+        [19.40, 87.20],
+
+        [19.70, 86.80],
+
+        [20.00, 86.40]
+
+    ];
+
+
+    const cycloneTrack = L.polyline(
+        cyclonePositions,
+        {
+            weight: 4,
+            dashArray: "10,6"
+        }
+    );
+
+    cycloneTrack.bindPopup("Predicted Cyclone Track");
+
+    cycloneTrack.addTo(cycloneLayer);
+
+
+    /* =========================================
+       CURRENT CYCLONE POSITION
+    ========================================= */
+
+    let cycloneMarker = L.marker(
+        cyclonePositions[0]
+    )
+    .bindPopup("🌀 Cyclone Position")
+    .addTo(cycloneLayer);
+
+
+    /* =========================================
+       ADD DEFAULT LAYERS
+    ========================================= */
+
+    roadsLayer.addTo(map);
+    hospitalsLayer.addTo(map);
+    sheltersLayer.addTo(map);
+    powerLayer.addTo(map);
+    waterLayer.addTo(map);
+    coastlineLayer.addTo(map);
+    cycloneLayer.addTo(map);
+
+
+    /* =========================================
+       LAYER TOGGLE FUNCTION
+    ========================================= */
+
+    function toggleLayer(
+        checkboxId,
+        layer
+    ) {
+
+        document
+            .getElementById(checkboxId)
+            .addEventListener(
+                "change",
+                function() {
+
+                    if (this.checked) {
+
+                        map.addLayer(layer);
+
+                    } else {
+
+                        map.removeLayer(layer);
+
+                    }
+
+                }
+            );
+
+    }
+
+
+    toggleLayer(
+        "roadsToggle",
+        roadsLayer
+    );
+
+    toggleLayer(
+        "hospitalToggle",
+        hospitalsLayer
+    );
+
+    toggleLayer(
+        "shelterToggle",
+        sheltersLayer
+    );
+
+    toggleLayer(
+        "powerToggle",
+        powerLayer
+    );
+
+    toggleLayer(
+        "waterToggle",
+        waterLayer
+    );
+
+    toggleLayer(
+        "coastToggle",
+        coastlineLayer
+    );
+
+    toggleLayer(
+        "populationToggle",
+        populationLayer
+    );
+
+    toggleLayer(
+        "cycloneToggle",
+        cycloneLayer
+    );
+
+
+    /* =========================================
+       CYCLONE TIMELINE
+    ========================================= */
+
+    const slider =
+        document.getElementById("timeSlider");
+
+    const timeDisplay =
+        document.getElementById("timeDisplay");
+
+
+    const times = [
+
+        "12:00 PM",
+
+        "03:00 PM",
+
+        "06:00 PM",
+
+        "09:00 PM",
+
+        "12:00 AM"
+
+    ];
+
+
+    slider.addEventListener(
+        "input",
+        function() {
+
+            const index =
+                Number(this.value);
+
+            timeDisplay.textContent =
+                times[index];
+
+
+            /* Move cyclone marker */
+
+            cycloneMarker.setLatLng(
+                cyclonePositions[index]
+            );
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
