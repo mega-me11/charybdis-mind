@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import json
+import joblib
 
 app = FastAPI(
     title="Cyclone Impact Forecaster API",
@@ -19,7 +20,9 @@ app.add_middleware(
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
+MODEL_PATH = BASE_DIR / "models" / "cyclone_flood_rf.joblib"
 
+model = joblib.load(MODEL_PATH)
 
 def load_json(filename):
     path = DATA_DIR / filename
