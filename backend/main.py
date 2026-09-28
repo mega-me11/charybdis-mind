@@ -53,6 +53,7 @@ def predict(input_data: PredictionInput):
         "population": input_data.population,
         "slope": input_data.slope
     }])
+    features = features[model.feature_names_in_]
 
     prediction = int(model.predict(features)[0])
     probability = float(model.predict_proba(features)[0][1])
@@ -100,4 +101,5 @@ def advisory():
 
     return {
         "advisory": path.read_text(encoding="utf-8")
+        
     }
