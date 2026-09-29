@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> Charybdis Mind | Unified Map & Trajectory</title>
+<title>Charybdis Mind</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -214,7 +214,13 @@ body{
 
     <div>
         <div class="font-bold text-lg">
-            🌪️  Charybdis Mind
+            🌪️ Charybdis Mind
+            <span
+                id="backendBadge"
+                class="text-[10px] px-2 py-1 rounded bg-slate-700 text-slate-300"
+            >
+                BACKEND: OFFLINE
+            </span>
         </div>
 
         <div class="text-[10px] text-slate-400">
@@ -441,7 +447,7 @@ body{
 
 <!-- RIGHT TELEMETRY -->
 
-<aside class="absolute top-4 right-4 w-72 glass panel rounded-xl p-4 z-[500]">
+<aside class="absolute top-4 right-4 w-96 glass panel rounded-xl p-4 z-[500] max-h-[calc(100vh-110px)] overflow-y-auto">
 
     <div class="flex justify-between items-center">
 
@@ -536,10 +542,154 @@ body{
         </div>
 
         <div
-            id="ai-advisory"
-            class="text-xs text-slate-300 mt-1">
-            Loading backend advisory...
+        id="ai-advisory"
+        class="text-xs text-slate-300 mt-2 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto"
+        >
+        Loading backend advisory...
         </div>
+
+        <!-- RF FLOOD PREDICTION -->
+         <!-- DISASTER-AWARE ROUTING -->
+<div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
+
+    <div class="flex items-center justify-between mb-3">
+        <div>
+            <div class="text-xs font-bold text-sky-300">
+                DISASTER-AWARE ROUTING
+            </div>
+            <div class="text-[10px] text-slate-500">
+                Time-dependent route optimization
+            </div>
+        </div>
+
+           
+
+</div>
+<div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
+
+    <div class="flex items-center justify-between mb-3">
+        <div>
+            <div class="text-xs font-bold text-sky-300">
+                RF FLOOD PREDICTION
+                <!-- DISASTER-AWARE ROUTING -->
+<div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
+
+    <div class="flex items-center justify-between mb-3">
+        <div>
+            <div class="text-xs font-bold text-sky-300">
+                DISASTER-AWARE ROUTING
+            </div>
+            <div class="text-[10px] text-slate-500">
+                Time-dependent route optimization
+            </div>
+        </div>
+
+        <div
+            id="routing-status"
+            class="text-[10px] px-2 py-1 rounded bg-slate-700 text-slate-300"
+        >
+            WAITING
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2">
+
+        <div class="bg-slate-950/60 rounded-lg p-3">
+            <div class="text-[9px] text-slate-500">
+                ROUTE SCENARIO
+            </div>
+            <div
+                id="route-stage"
+                class="text-sm font-bold text-sky-300 mt-1"
+            >
+                —
+            </div>
+        </div>
+
+        <div class="bg-slate-950/60 rounded-lg p-3">
+            <div class="text-[9px] text-slate-500">
+                ROUTING COST
+            </div>
+            <div
+                id="route-cost"
+                class="text-sm font-bold text-yellow-300 mt-1"
+            >
+                —
+            </div>
+        </div>
+
+        <div class="bg-slate-950/60 rounded-lg p-3">
+            <div class="text-[9px] text-slate-500">
+                ROUTE CHANGE
+            </div>
+            <div
+                id="route-change"
+                class="text-sm font-bold text-orange-300 mt-1"
+            >
+                —
+            </div>
+        </div>
+
+    </div>
+
+    <div
+        id="routing-note"
+        class="text-[10px] text-slate-500 mt-3"
+    >
+        Waiting for routing data.
+    </div>
+
+</div>
+            </div>
+            <div class="text-[10px] text-slate-500">
+                Geospatial risk model
+            </div>
+        </div>
+
+        <div
+            id="flood-model-status"
+            class="text-[10px] px-2 py-1 rounded bg-slate-700 text-slate-300"
+        >
+            READY
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+
+        <div class="bg-slate-950/60 rounded-lg p-3">
+            <div class="text-[10px] text-slate-500">
+                FLOOD PROBABILITY
+            </div>
+            <div
+                id="flood-probability"
+                class="text-xl font-bold text-sky-300 mt-1"
+            >
+                —
+            </div>
+        </div>
+
+        <div class="bg-slate-950/60 rounded-lg p-3">
+            <div class="text-[10px] text-slate-500">
+                RISK CLASS
+            </div>
+            <div
+                id="flood-risk-class"
+                class="text-xl font-bold text-emerald-300 mt-1"
+            >
+                —
+            </div>
+        </div>
+
+    </div>
+
+    <div
+        id="flood-model-note"
+        class="text-[10px] text-slate-500 mt-3"
+    >
+        Waiting for geospatial prediction input.
+    </div>
+
+</div>
 
     </div>
 
@@ -548,7 +698,7 @@ body{
 
 <!-- BOTTOM STATUS -->
 
-<div class="absolute bottom-4 right-4 w-72 glass rounded-xl p-3 z-[500]">
+<aside class="absolute top-4 right-4 w-72 glass panel rounded-xl p-4 z-[500] max-h-[calc(100vh-110px)] overflow-y-auto"></aside>
 
     <div class="flex justify-between">
 
@@ -918,6 +1068,75 @@ body{
 
                 </div>
 
+                <!-- SEVERITY -->
+
+<div class="mb-5">
+
+    <label class="text-xs font-semibold">
+        How severe is the situation?
+    </label>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+
+        <div class="feedback-category">
+
+            <input
+                type="radio"
+                name="severity"
+                id="severityLow"
+                value="Low">
+
+            <label for="severityLow">
+                🟢 Low
+            </label>
+
+        </div>
+
+        <div class="feedback-category">
+
+            <input
+                type="radio"
+                name="severity"
+                id="severityModerate"
+                value="Moderate">
+
+            <label for="severityModerate">
+                🟡 Moderate
+            </label>
+
+        </div>
+
+        <div class="feedback-category">
+
+            <input
+                type="radio"
+                name="severity"
+                id="severityHigh"
+                value="High">
+
+            <label for="severityHigh">
+                🟠 High
+            </label>
+
+        </div>
+
+        <div class="feedback-category">
+
+            <input
+                type="radio"
+                name="severity"
+                id="severityCritical"
+                value="Critical">
+
+            <label for="severityCritical">
+                🔴 Critical
+            </label>
+
+        </div>
+
+    </div>
+
+</div>
 
                 <!-- OBSERVATION -->
 
@@ -1129,6 +1348,12 @@ body{
 
 
 <script>
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+function $(id){
+    return document.getElementById(id);
+}
 
 const DEFAULT_DATASET = {
 
@@ -1943,6 +2168,8 @@ function jump(i){
         p.timestamp;
 
     updateTelemetry();
+    updateRouteForTime(tracker.index);
+    
 
 }
 
@@ -2727,83 +2954,373 @@ logToggle.onclick =
         );
 
 
-/* BACKEND */
+/* ================= BACKEND CONNECTION ================= */
 
-const API_BASE_URL =
-    "http://127.0.0.1:8000";
+function setBadge(text, cls){
+  $("backendBadge").textContent = "BACKEND: " + text;
+  $("backendBadge").className =
+    "text-[10px] px-2 py-1 rounded " + cls;
+}
 
+async function getJSON(path){
+  const r = await fetch(API_BASE_URL + path);
+
+  if(!r.ok){
+    throw Error(`${path} returned ${r.status}`);
+  }
+
+  return r.json();
+}
+
+let routingData = null;
+
+/* ---------- BACKEND LOAD ---------- */
 
 async function loadBackendData(){
 
-    try{
+  // 1. HEALTH
+  try{
+    await getJSON("/health");
 
-        const r =
-            await fetch(
-                `${API_BASE_URL}/routing`
-            );
+    setBadge(
+      "CONNECTED",
+      "bg-emerald-500/20 text-emerald-300"
+    );
 
+    addLog("Backend connected.", true);
 
-        if(!r.ok)
-            throw Error(
-                `Routing API ${r.status}`
-            );
+  }catch(e){
 
+    setBadge(
+      "OFFLINE",
+      "bg-red-500/20 text-red-300"
+    );
 
-        const routing =
-            await r.json();
+    $("ai-advisory").textContent =
+      "Backend offline. Start the FastAPI server.";
 
+    addLog(
+      `Backend connection error: ${e.message}`,
+      true
+    );
 
-        console.log(
-            "Routing data:",
-            routing
-        );
+    return;
+  }
 
+function formatAdvisory(raw){
 
-        const a =
-            await fetch(
-                `${API_BASE_URL}/advisory`
-            );
+    if(!raw) return "No advisory available.";
 
+    const lines = raw
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
 
-        if(!a.ok)
-            throw Error(
-                `Advisory API ${a.status}`
-            );
+    const risk = [];
+    const infrastructure = [];
+    const actions = [];
 
+    let section = "";
 
-        const advisory =
-            await a.json();
+    for(const line of lines){
 
+        const upper = line.toUpperCase();
 
-        document
-        .getElementById("ai-advisory")
-        .textContent =
-            advisory.advisory
-            ||
-            "No advisory available.";
+        if(upper === "RISK DISTRIBUTION"){
+            section = "risk";
+            continue;
+        }
 
+        if(upper === "INFRASTRUCTURE EXPOSURE"){
+            section = "infrastructure";
+            continue;
+        }
 
-        addLog(
-            "Backend routing + Gemini advisory synchronized.",
-            true
-        );
+        if(upper === "PRIORITY ACTIONS"){
+            section = "actions";
+            continue;
+        }
 
+        if(
+            upper === "MODEL LIMITATIONS" ||
+            upper === "FORECAST SUMMARY"
+        ){
+            section = "";
+            continue;
+        }
+
+        if(section === "risk"){
+            risk.push(line);
+        }
+
+        if(section === "infrastructure"){
+            infrastructure.push(line);
+        }
+
+        if(section === "actions"){
+            actions.push(line);
+        }
     }
-    catch(e){
 
-        document
-        .getElementById("ai-advisory")
-        .textContent =
-            "Backend connection unavailable.";
+    const highRisk =
+        risk.find(x => x.startsWith("High Risk:")) || "";
 
+    const moderateRisk =
+        risk.find(x => x.startsWith("Moderate Risk:")) || "";
 
-        addLog(
-            `Backend connection error: ${e.message}`,
-            true
-        );
+    const meanProbability =
+        risk.find(x =>
+            x.startsWith("Mean flood probability:")
+        ) || "";
 
+    const roadExposure =
+        infrastructure.find(x =>
+            x.startsWith("Road exposure:")
+        ) || "";
+
+    const powerExposure =
+        infrastructure.find(x =>
+            x.startsWith("Power infrastructure exposure:")
+        ) || "";
+
+    const usefulActions = actions
+        .filter(x => /^\d+\./.test(x))
+        .slice(0,3);
+
+    return [
+        "RISK SNAPSHOT",
+        `${highRisk} • ${moderateRisk}`,
+        meanProbability,
+
+        "",
+        "INFRASTRUCTURE EXPOSURE",
+        roadExposure,
+        powerExposure,
+
+        "",
+        "PRIORITY ACTIONS",
+        ...usefulActions
+    ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+  // 2. AI ADVISORY
+  try{
+
+    const a = await getJSON("/advisory");
+
+    if(a.error){
+
+      $("ai-advisory").textContent =
+        "No advisory generated yet.";
+
+      addLog(`Advisory: ${a.error}`);
+
+    }else{
+
+      $("ai-advisory").textContent =
+        formatAdvisory(a.advisory);
+
+      addLog(
+        "AI disaster advisory loaded.",
+        true
+      );
     }
 
+  }catch(e){
+
+    $("ai-advisory").textContent =
+      "Advisory unavailable.";
+
+    addLog(
+      `Advisory error: ${e.message}`
+    );
+  }
+
+
+  // 3. ROUTING
+  try{
+
+    const r = await getJSON("/routing");
+
+    if(r.error){
+
+      addLog(`Routing: ${r.error}`);
+
+    }else{
+
+      routingData = r;
+
+      addLog(
+        "Disaster-aware routing data loaded.",
+        true
+      );
+
+      displayRoutingSummary(r);
+    }
+
+  }catch(e){
+
+    addLog(
+      `Routing error: ${e.message}`
+    );
+  }
+}
+
+
+/* ---------- CONCISE AI ADVISORY ---------- */
+
+function formatAdvisory(raw){
+
+    if(!raw) return "No advisory available.";
+
+    const lines = raw
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
+
+    const useful = [];
+
+    for(const line of lines){
+
+        const clean = line
+            .replace(/^[-=*#]+/, "")
+            .trim();
+
+        if(!clean) continue;
+
+        // Skip large report headings
+        if(
+            clean.includes("CYCLONE IMPACT") ||
+            clean.includes("FORECAST SUMMARY") ||
+            clean.includes("FORECASTING PIPELINE")
+        ){
+            continue;
+        }
+
+        // Skip explanatory filler
+        if(
+            clean.startsWith("The forecasting pipeline") ||
+            clean.startsWith("The model") ||
+            clean.startsWith("This analysis")
+        ){
+            continue;
+        }
+
+        useful.push(clean);
+
+        if(useful.length >= 6) break;
+    }
+
+    return useful.join("\n");
+}
+
+
+/* ---------- ROUTING SUMMARY ---------- */
+
+let activeRouteLayer = null;
+let activeRouteStage = null;
+
+function displayRoutingSummary(r){
+
+    if(!r || !r.routes) return;
+
+    routingData = r;
+
+    updateRouteForTime(tracker.index);
+
+    addLog(
+        "Disaster-aware routing loaded.",
+        true
+    );
+}
+
+
+function updateRouteForTime(index){
+
+    if(!routingData || !routingData.routes) return;
+    if(!data || !data.track || !data.track.length) return;
+
+    const point = data.track[index];
+
+    if(!point) return;
+
+    const landfall = Number(point.landfallIn);
+
+    const stages = [48, 24, 12, 6, 0];
+
+    // Select the routing scenario whose
+    // time-to-landfall is closest to the
+    // current cyclone timeline position.
+    let selectedStage = stages[0];
+    let smallestDifference = Infinity;
+
+    for(const stage of stages){
+
+        const difference =
+            Math.abs(stage - landfall);
+
+        if(difference < smallestDifference){
+
+            smallestDifference = difference;
+            selectedStage = stage;
+        }
+    }
+
+    const route =
+        routingData.routes[String(selectedStage)];
+    $("route-stage").textContent =
+        `T-${selectedStage}h`;
+
+    $("route-cost").textContent =
+        Number(route.routing_cost).toFixed(2);
+
+    $("route-change").textContent =
+        `${Number(route.change_percent).toFixed(1)}%`;
+
+    $("routing-status").textContent =
+        "ACTIVE";
+
+    $("routing-note").textContent =
+        `Route updated for cyclone position T-${landfall}h.`;
+
+    if(!route || !Array.isArray(route.path)) return;
+
+    // Remove previous active route.
+    if(window.activeRouteLayer){
+        map.removeLayer(window.activeRouteLayer);
+    }
+
+    const latlngs = route.path.map(
+        point => [Number(point[0]), Number(point[1])]
+    );
+
+    window.activeRouteLayer =
+        L.polyline(
+            latlngs,
+            {
+                weight: 7,
+                opacity: 0.95,
+                interactive: true
+            }
+        ).addTo(map);
+
+    window.activeRouteLayer.bindPopup(`
+        <div style="min-width:180px">
+            <b>DISASTER-AWARE ROUTE</b><br><br>
+            Time to landfall: T-${route.time_to_landfall_h}h<br>
+            Routing cost: ${Number(route.routing_cost).toFixed(2)}<br>
+            Route change: ${Number(route.change_percent).toFixed(1)}%
+        </div>
+    `);
+
+    window.activeRouteStage = selectedStage;
+
+    addLog(
+        `Route: T-${selectedStage}h | Cost ${Number(route.routing_cost).toFixed(2)} | Change ${Number(route.change_percent).toFixed(1)}%`,
+        true
+    );
 }
 
 
@@ -2915,7 +3432,35 @@ const humanSignalBar =
 
 
 let selectedRating = 0;
+let userLatitude = null;
+let userLongitude = null;
 
+if ("geolocation" in navigator) {
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+
+            userLatitude = position.coords.latitude;
+            userLongitude = position.coords.longitude;
+
+            console.log(
+                "User location:",
+                userLatitude,
+                userLongitude
+            );
+
+        },
+        (error) => {
+
+            console.warn(
+                "Unable to get user location:",
+                error.message
+            );
+
+        }
+    );
+
+}
 
 /* OPEN DASHBOARD */
 
@@ -3088,7 +3633,6 @@ function getFeedback(){
 
 }
 
-
 /* SAVE FEEDBACK */
 
 function saveFeedback(feedback){
@@ -3140,13 +3684,17 @@ function updateFeedbackContext(){
 /* SUBMIT FEEDBACK */
 
 submitFeedback.onclick =
-    () => {
+    async () => {
 
         const impact =
             document.querySelector(
                 'input[name="impact"]:checked'
             );
 
+        const severity =
+            document.querySelector(
+                'input[name="severity"]:checked'
+            );
 
         const comment =
             feedbackComment.value.trim();
@@ -3175,6 +3723,15 @@ submitFeedback.onclick =
 
         }
 
+        if(!severity){
+            showFeedbackMessage(
+                "Please select a severity level.",
+                "error"
+            );
+            
+            return;
+        }
+
 
         if(!comment){
 
@@ -3193,72 +3750,123 @@ submitFeedback.onclick =
                 tracker.index
             ];
 
+        if(userLatitude === null || userLongitude === null){
+            showFeedbackMessage(
+                "Your location could not be determined. Please allow location access and try again.",
+                "error"
+            );
+            return;
+
+}
 
         const feedback = {
 
-            id:
-                Date.now(),
+    safety_rating:
+        selectedRating,
 
-            storm:
-                data.name ||
-                "CUSTOM STORM",
+    report_type:
+        impact.value,
 
-            timestamp:
-                p.timestamp,
+    severity:
+        severity.value,
 
-            lat:
-                p.lat,
+    description:
+        comment,
 
-            lon:
-                p.lon,
+    latitude:
+        userLatitude,
 
-            wind:
-                p.wind,
+    longitude:
+        userLongitude,
 
-            safetyRating:
-                selectedRating,
+    timestamp:
+        new Date().toISOString(),
 
-            impact:
-                impact.value,
+    cyclone_time:
+        p.timestamp
 
-            comment:
-                comment,
-
-            submittedAt:
-                new Date().toISOString()
-
-        };
+};
 
 
-        const feedbackList =
-            getFeedback();
 
 
-        feedbackList.unshift(
-            feedback
+        try {
+
+        
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/feedback",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(feedback)
+            }
         );
 
 
-        saveFeedback(
-            feedbackList
-        );
+    if(!response.ok){
+
+    const errorData =
+        await response.json();
+
+    console.error(
+        "Backend validation error:",
+        errorData
+    );
+
+    
+
+    throw new Error(
+        "Failed to submit feedback"
+    );
+
+}
 
 
-        addLog(
-            "👤 Human observation submitted.",
-            true
-        );
+    const result =
+        await response.json();
 
 
-        showFeedbackMessage(
-            "Observation submitted successfully.",
-            "success"
-        );
+    console.log(
+        "Feedback submitted:",
+        result
+    );
 
 
-        resetFeedbackForm();
+    addLog(
+        "👤 Human observation submitted.",
+        true
+    );
 
-        updateFeedbackDashboard();
+
+    showFeedbackMessage(
+        "Observation submitted successfully.",
+        "success"
+    );
+
+
+    resetFeedbackForm();
+    updateFeedbackDashboard();
+
+}
+catch(error){
+
+    console.error(
+        "Feedback submission error:",
+        error
+    );
+
+
+    showFeedbackMessage(
+        "Could not submit observation. Please try again.",
+        "error"
+    );
+
+}
 
     };
 
@@ -3362,89 +3970,119 @@ function resetFeedbackForm(){
 
 /* UPDATE DASHBOARD */
 
-function updateFeedbackDashboard(){
+async function updateFeedbackDashboard(){
 
-    const feedbackList =
-        getFeedback();
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:8000/feedback"
+            );
 
 
-    totalFeedback.textContent =
-        feedbackList.length;
+        if(!response.ok){
+
+            throw new Error(
+                "Failed to fetch feedback"
+            );
+
+        }
 
 
-    if(!feedbackList.length){
+        const data =
+            await response.json();
+
+
+        const feedbackList =
+            data.feedback || [];
+
+
+        totalFeedback.textContent =
+            feedbackList.length;
+
+
+        if(!feedbackList.length){
+
+            averageSafety.textContent =
+                "—";
+
+            highImpact.textContent =
+                "0";
+
+            humanSignalBar.style.width =
+                "5%";
+
+            renderImpactStats(
+                feedbackList
+            );
+
+            renderRecentFeedback(
+                feedbackList
+            );
+
+            return;
+
+        }
+
+
+        const average =
+            feedbackList.reduce(
+                (sum, item) =>
+                    sum + item.safety_rating,
+                0
+            )
+            /
+            feedbackList.length;
+
 
         averageSafety.textContent =
-            "—";
+            average.toFixed(1)
+            + "/5";
+
+
+        const highImpactCount =
+            feedbackList.filter(
+                item =>
+                    item.severity === "High" ||
+                    item.severity === "Critical"
+            ).length;
+
 
         highImpact.textContent =
-            "0";
+            highImpactCount;
+
+
+        const signal =
+            Math.min(
+                100,
+                5 + feedbackList.length * 5
+            );
+
 
         humanSignalBar.style.width =
-            "5%";
+            `${signal}%`;
+
 
         renderImpactStats(
             feedbackList
         );
 
+
         renderRecentFeedback(
             feedbackList
         );
 
-        return;
+    }
+    catch(error){
+
+        console.error(
+            "Feedback dashboard error:",
+            error
+        );
 
     }
 
-
-    const average =
-        feedbackList.reduce(
-            (sum,item) =>
-                sum + item.safetyRating,
-            0
-        )
-        /
-        feedbackList.length;
-
-
-    averageSafety.textContent =
-        average.toFixed(1)
-        + "/5";
-
-
-    const highImpactCount =
-        feedbackList.filter(
-            item =>
-                item.safetyRating <= 2
-        ).length;
-
-
-    highImpact.textContent =
-        highImpactCount;
-
-
-    const signal =
-        Math.min(
-            100,
-            5 +
-            feedbackList.length*5
-        );
-
-
-    humanSignalBar.style.width =
-        `${signal}%`;
-
-
-    renderImpactStats(
-        feedbackList
-    );
-
-
-    renderRecentFeedback(
-        feedbackList
-    );
-
 }
-
 
 /* IMPACT STATISTICS */
 
@@ -3475,9 +4113,9 @@ function renderImpactStats(
     feedbackList.forEach(
         item => {
 
-            counts[item.impact] =
-                (counts[item.impact] || 0)
-                +1;
+            counts[item.report_type] =
+                (counts[item.report_type] || 0)
+                + 1;
 
         }
     );
@@ -3487,7 +4125,7 @@ function renderImpactStats(
         Object.entries(counts)
         .sort(
             (a,b) =>
-                b[1]-a[1]
+                b[1] - a[1]
         );
 
 
@@ -3500,7 +4138,7 @@ function renderImpactStats(
 
             const percentage =
                 Math.round(
-                    count/max*100
+                    count / max * 100
                 );
 
 
@@ -3586,7 +4224,7 @@ function renderRecentFeedback(
 
             const date =
                 new Date(
-                    item.submittedAt
+                    item.timestamp
                 );
 
 
@@ -3598,15 +4236,15 @@ function renderRecentFeedback(
 
                         <div class="text-xs font-bold text-sky-300">
 
-                            ${item.impact}
+                            ${escapeHtml(item.report_type)}
 
                         </div>
 
                         <div class="text-[10px] text-slate-400 mt-1">
 
-                            ${item.timestamp}
+                            ${escapeHtml(item.cyclone_time)}
                             •
-                            ${item.wind} km/h
+                            ${escapeHtml(item.severity)}
 
                         </div>
 
@@ -3614,8 +4252,8 @@ function renderRecentFeedback(
 
                     <div class="text-yellow-400 text-xs">
 
-                        ${"★".repeat(item.safetyRating)}
-                        ${"☆".repeat(5-item.safetyRating)}
+                        ${"★".repeat(item.safety_rating)}
+                        ${"☆".repeat(5-item.safety_rating)}
 
                     </div>
 
@@ -3623,11 +4261,17 @@ function renderRecentFeedback(
 
                 <div class="text-xs text-slate-300 mt-2">
 
-                    ${escapeHtml(item.comment)}
+                    ${escapeHtml(item.description)}
 
                 </div>
 
                 <div class="text-[9px] text-slate-500 mt-2">
+
+                    Location:
+                    ${Number(item.latitude).toFixed(4)},
+                    ${Number(item.longitude).toFixed(4)}
+
+                    <br>
 
                     Submitted ${date.toLocaleString()}
 
@@ -3670,40 +4314,10 @@ document
 .onclick =
     () => {
 
-        const feedbackList =
-            getFeedback();
-
-
-        if(!feedbackList.length){
-
-            return;
-
-        }
-
-
-        const confirmed =
-            confirm(
-                "Clear all locally stored human feedback?"
-            );
-
-
-        if(!confirmed){
-
-            return;
-
-        }
-
-
-        localStorage.removeItem(
-            "cycloneHumanFeedback"
-        );
-
-
         updateFeedbackDashboard();
 
-
         addLog(
-            "Human feedback data cleared.",
+            "Human feedback dashboard refreshed.",
             true
         );
 
@@ -3716,10 +4330,86 @@ renderTrajectory();
 
 configure();
 
+async function predictFlood(v){
+
+    const res = await fetch(
+        API_BASE_URL + "/predict",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                elevation: Number(v.elevation),
+                distance_to_coast: Number(v.distance_to_coast),
+                rainfall: Number(v.rainfall),
+                population: Number(v.population),
+                slope: Number(v.slope)
+            })
+        }
+    );
+
+    if(!res.ok){
+        throw Error(
+            res.status === 503
+                ? "Flood model unavailable"
+                : `Prediction failed (${res.status})`
+        );
+    }
+
+    return res.json();
+}
+
+
+async function updateFloodPrediction(){
+
+    const status = $("flood-model-status");
+    const probability = $("flood-probability");
+    const riskClass = $("flood-risk-class");
+    const note = $("flood-model-note");
+
+    try{
+
+        status.textContent = "RUNNING";
+
+        const input = {
+            elevation: 4.5,
+            distance_to_coast: 53.5,
+            rainfall: 126.5,
+            population: 19.0,
+            slope: 0.012
+        };
+
+        const result = await predictFlood(input);
+
+        const pct =
+            (Number(result.flood_probability) * 100).toFixed(1);
+
+        probability.textContent = `${pct}%`;
+
+        riskClass.textContent =
+            result.risk_class === 1
+                ? "HIGH"
+                : "LOW";
+
+        status.textContent = "MODEL ACTIVE";
+
+        note.textContent =
+            "Prediction generated from elevation, coast distance, rainfall, population and slope.";
+
+    }catch(e){
+
+        status.textContent = "UNAVAILABLE";
+
+        note.textContent = e.message;
+
+        console.error("Flood prediction:", e);
+    }
+}
+
 loadBackendData();
-
+updateFloodPrediction();
 updateFeedbackDashboard();
-
 updateFeedbackContext();
 
 </script>
