@@ -400,7 +400,7 @@ The timeline architecture is designed so that sample cyclone data can eventually
 
 # 👩‍💻 Team PromptForge
 
-### Megha Chatterjee : Team Lead - Geospatial Intelligence • Machine Learning • Routing • Backend • AI Integration • Human Feedback**
+### Megha Chatterjee (Team Lead) — Geospatial Intelligence • Machine Learning • Routing • Backend • AI Integration • Human Feedback**
 
 ### Jaspreet Kaur — Cyclone Timeline •  Map Interaction • Unified Dashboard UI
 
@@ -409,4 +409,4 @@ The timeline architecture is designed so that sample cyclone data can eventually
 ### Shreya Ranjan — Presentation & Demonstration
 
 
-## Built for Google Cloud — Build with AI: Code for Communities
+## Build with AI: Code for Communities 
