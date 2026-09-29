@@ -43,6 +43,15 @@ class PredictionInput(BaseModel):
     population: float
     slope: float
 
+class FeedbackInput(BaseModel):
+    safety_rating: int
+    report_type: str
+    severity: str
+    description: str
+    latitude: float
+    longitude: float
+    timestamp: str
+    cyclone_time: str
 
 @app.post("/predict")
 def predict(input_data: PredictionInput):
