@@ -1,0 +1,3728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Charybdis Mind | Unified Map & Trajectory</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#020617;
+    color:#e2e8f0;
+    font-family:Inter,Arial,sans-serif
+}
+
+#map{
+    height:calc(100vh - 64px);
+    width:100%
+}
+
+.glass{
+    background:rgba(2,6,23,.88);
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(148,163,184,.18)
+}
+
+.panel{
+    box-shadow:0 10px 30px rgba(0,0,0,.35)
+}
+
+.small{
+    font-size:11px
+}
+
+::-webkit-scrollbar{
+    width:6px
+}
+
+::-webkit-scrollbar-thumb{
+    background:#475569;
+    border-radius:8px
+}
+
+.cyclone-pulse{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:#ef4444;
+    border:3px solid white;
+    box-shadow:
+        0 0 0 8px rgba(239,68,68,.18),
+        0 0 24px #ef4444
+}
+
+.map-label-icon{
+    background:transparent;
+    border:0
+}
+
+.map-pin{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    white-space:nowrap;
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+    text-shadow:0 1px 3px #000,0 0 4px #000;
+    pointer-events:none
+}
+
+.pin-icon{
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:2px solid #fff;
+    box-shadow:0 2px 7px rgba(0,0,0,.55)
+}
+
+.pin-hospital .pin-icon{background:#dc2626}
+.pin-shelter .pin-icon{background:#16a34a}
+.pin-power .pin-icon{background:#eab308}
+.pin-water .pin-icon{background:#0284c7}
+.pin-port .pin-icon{background:#7c3aed}
+.pin-radar .pin-icon{background:#0891b2}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+    background:#0f172a;
+    color:#e2e8f0
+}
+
+/* HUMAN FEEDBACK DASHBOARD */
+
+.feedback-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    z-index:3000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px
+}
+
+.feedback-modal.active{
+    display:flex
+}
+
+.feedback-dashboard{
+    width:95%;
+    max-width:900px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:rgba(2,6,23,.97);
+    border:1px solid rgba(56,189,248,.25);
+    border-radius:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,.65)
+}
+
+.feedback-card{
+    background:rgba(15,23,42,.8);
+    border:1px solid rgba(148,163,184,.15);
+    border-radius:12px
+}
+
+.feedback-stat{
+    background:rgba(15,23,42,.75);
+    border:1px solid rgba(148,163,184,.12);
+    border-radius:12px;
+    padding:14px
+}
+
+.feedback-category{
+    cursor:pointer;
+    transition:.2s
+}
+
+.feedback-category:hover{
+    transform:translateY(-1px)
+}
+
+.feedback-category input{
+    display:none
+}
+
+.feedback-category label{
+    display:block;
+    cursor:pointer;
+    padding:10px;
+    border-radius:10px;
+    background:#0f172a;
+    border:1px solid #334155;
+    text-align:center;
+    font-size:12px;
+    transition:.2s
+}
+
+.feedback-category input:checked + label{
+    background:rgba(14,165,233,.18);
+    border-color:#38bdf8;
+    color:#7dd3fc
+}
+
+.star{
+    cursor:pointer;
+    font-size:27px;
+    transition:.15s;
+    color:#475569
+}
+
+.star.active{
+    color:#facc15
+}
+
+.feedback-item{
+    border-left:3px solid #38bdf8;
+    background:rgba(15,23,42,.65);
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:8px
+}
+
+.feedback-success{
+    animation:feedbackSuccess .3s ease
+}
+
+@keyframes feedbackSuccess{
+    from{
+        transform:scale(.96);
+        opacity:.5
+    }
+    to{
+        transform:scale(1);
+        opacity:1
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="h-16 glass flex items-center justify-between px-4 z-[1000] relative">
+
+    <div>
+        <div class="font-bold text-lg">
+            🌪️  Charybdis Mind
+        </div>
+
+        <div class="text-[10px] text-slate-400">
+            TRACK BASED INFRASTRUCTURE VULNERABILITY
+        </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+
+        <button
+            id="histBtn"
+            class="px-3 py-2 rounded-lg bg-sky-500 text-white text-xs font-bold">
+            TIMELINE
+        </button>
+
+        <button
+            id="liveBtn"
+            class="px-3 py-2 rounded-lg text-slate-300 text-xs">
+            LIVE SIMULATION
+        </button>
+
+        <button
+            id="jsonBtn"
+            class="px-3 py-2 rounded-lg bg-slate-800 text-xs">
+            CUSTOM JSON
+        </button>
+
+        <!-- HUMAN FEEDBACK BUTTON -->
+        <button
+            id="feedbackBtn"
+            class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
+            👤 HUMAN FEEDBACK
+        </button>
+
+    </div>
+</header>
+
+<div class="relative">
+
+<div id="map"></div>
+
+<!-- LEFT MAP LAYERS -->
+
+<aside class="absolute top-4 left-4 w-64 glass panel rounded-xl p-4 z-[500] max-h-[calc(100vh-90px)] overflow-y-auto">
+
+    <h2 class="font-bold mb-1">
+        Map Layers
+    </h2>
+
+    <p class="text-[10px] text-slate-400 mb-3">
+        Toggle physical infrastructure
+    </p>
+
+    <div class="space-y-2 text-sm">
+
+        <label>
+            <input type="checkbox" id="roadsToggle" checked>
+            🛣️ Roads
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="hospitalToggle" checked>
+            🏥 Hospitals
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="shelterToggle" checked>
+            🛟 Emergency Shelters
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="powerToggle" checked>
+            ⚡ Power Infrastructure
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="waterToggle" checked>
+            💧 Water Facilities
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="coastToggle" checked>
+            🌊 Coastline
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="populationToggle">
+            👥 Population
+        </label><br>
+
+        <label>
+            <input type="checkbox" id="cycloneToggle" checked>
+            🌪️ Cyclone Track
+        </label>
+
+    </div>
+
+    <hr class="border-slate-700 my-4">
+
+    <h3 class="font-semibold text-sm mb-2">
+        Trajectory Timeline
+    </h3>
+
+    <input
+        id="timeSlider"
+        type="range"
+        min="0"
+        max="8"
+        value="0"
+        class="w-full">
+
+    <div class="flex justify-between text-[10px] text-slate-400">
+        <span id="sliderStart">T-48h</span>
+        <span id="timeDisplay">T-48h</span>
+        <span id="sliderEnd">T-0h</span>
+    </div>
+
+    <div class="grid grid-cols-3 gap-1 mt-3">
+
+        <button
+            id="prevBtn"
+            class="bg-slate-800 rounded p-2 text-xs">
+            ◀
+        </button>
+
+        <button
+            id="playBtn"
+            class="bg-sky-600 rounded p-2 text-xs">
+            ▶
+        </button>
+
+        <button
+            id="nextBtn"
+            class="bg-slate-800 rounded p-2 text-xs">
+            ▶
+        </button>
+
+    </div>
+
+    <div class="flex gap-1 mt-2">
+
+        <button
+            class="speed bg-sky-500/20 text-sky-300 rounded px-2 py-1 text-[10px]"
+            data-speed="1500">
+            1x
+        </button>
+
+        <button
+            class="speed rounded px-2 py-1 text-[10px]"
+            data-speed="750">
+            2x
+        </button>
+
+        <button
+            class="speed rounded px-2 py-1 text-[10px]"
+            data-speed="300">
+            5x
+        </button>
+
+    </div>
+
+    <hr class="border-slate-700 my-4">
+
+    <h3 class="font-semibold text-sm mb-2">
+        Basemap
+    </h3>
+
+    <div class="grid grid-cols-2 gap-1">
+
+        <button
+            class="base bg-slate-800 rounded p-2 text-[10px]"
+            data-base="satellite">
+            Satellite
+        </button>
+
+        <button
+            class="base bg-slate-800 rounded p-2 text-[10px]"
+            data-base="dark">
+            Dark Ocean
+        </button>
+
+        <button
+            class="base bg-slate-800 rounded p-2 text-[10px]"
+            data-base="ocean">
+            Ocean
+        </button>
+
+        <button
+            class="base bg-slate-800 rounded p-2 text-[10px]"
+            data-base="clear">
+            Clear Coast
+        </button>
+
+    </div>
+
+    <hr class="border-slate-700 my-4">
+
+    <h3 class="font-semibold text-sm mb-2">
+        Trajectory Overlays
+    </h3>
+
+    <label>
+        <input type="checkbox" id="layer-ports" checked>
+        ⚓ Ports
+    </label><br>
+
+    <label>
+        <input type="checkbox" id="layer-shelters" checked>
+        🛟 Trajectory Shelters
+    </label><br>
+
+    <label>
+        <input type="checkbox" id="layer-radars" checked>
+        📡 Doppler Radars
+    </label><br>
+
+    <label>
+        <input type="checkbox" id="layer-windcone" checked>
+        🔴 Wind Radius
+    </label>
+
+</aside>
+
+
+<!-- RIGHT TELEMETRY -->
+
+<aside class="absolute top-4 right-4 w-72 glass panel rounded-xl p-4 z-[500]">
+
+    <div class="flex justify-between items-center">
+
+        <div>
+
+            <div class="text-[10px] text-slate-400">
+                ACTIVE CYCLONE
+            </div>
+
+            <div id="stormName" class="font-bold text-lg">
+                CYCLONE DANA
+            </div>
+
+        </div>
+
+        <span
+            id="category"
+            class="text-[10px] bg-red-500/20 text-red-300 border border-red-400/30 rounded px-2 py-1">
+            VSCS
+        </span>
+
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mt-4">
+
+        <div class="bg-slate-900/70 rounded p-2">
+            <div class="small text-slate-400">WIND</div>
+            <b id="wind">65</b> km/h
+        </div>
+
+        <div class="bg-slate-900/70 rounded p-2">
+            <div class="small text-slate-400">PRESSURE</div>
+            <b id="pressure">994</b> hPa
+        </div>
+
+        <div class="bg-slate-900/70 rounded p-2">
+            <div class="small text-slate-400">MOVEMENT</div>
+            <b id="heading">NE</b>
+        </div>
+
+        <div class="bg-slate-900/70 rounded p-2">
+            <div class="small text-slate-400">POSITION</div>
+            <b id="coords">14.20°N, 89.60°E</b>
+        </div>
+
+    </div>
+
+    <div class="mt-3 text-xs">
+
+        <div class="text-slate-400">
+            TIMESTAMP
+        </div>
+
+        <div id="timestamp">
+            T-48h
+        </div>
+
+        <div class="text-slate-400 mt-2">
+            LANDFALL
+        </div>
+
+        <div id="landfall" class="text-amber-300">
+            IN ~48 HOURS
+        </div>
+
+    </div>
+
+    <div class="mt-3">
+
+        <div class="flex justify-between text-[10px] text-slate-400">
+
+            <span>
+                Wind intensity
+            </span>
+
+            <span id="peak"></span>
+
+        </div>
+
+        <canvas
+            id="spark"
+            height="80"
+            class="w-full">
+        </canvas>
+
+    </div>
+
+    <div class="mt-3 p-3 rounded bg-sky-950/60 border border-sky-500/20">
+
+        <div class="text-[10px] text-sky-300 font-bold">
+            🤖 AI DISASTER ADVISORY
+        </div>
+
+        <div
+            id="ai-advisory"
+            class="text-xs text-slate-300 mt-1">
+            Loading backend advisory...
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- BOTTOM STATUS -->
+
+<div class="absolute bottom-4 right-4 w-72 glass rounded-xl p-3 z-[500]">
+
+    <div class="flex justify-between">
+
+        <span
+            id="feedStatus"
+            class="text-[10px] text-emerald-400">
+            HISTORICAL TIMELINE MODE
+        </span>
+
+        <button
+            id="logToggle"
+            class="text-[10px] text-sky-300">
+            Telemetry Log
+        </button>
+
+    </div>
+
+    <div
+        id="log"
+        class="hidden max-h-28 overflow-y-auto mt-2 text-[10px] space-y-1">
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- JSON MODAL -->
+
+<div
+    id="jsonModal"
+    class="hidden fixed inset-0 bg-black/70 z-[2000] items-center justify-center">
+
+    <div class="glass rounded-xl p-5 w-[90%] max-w-2xl">
+
+        <div class="flex justify-between mb-3">
+
+            <h2 class="font-bold">
+                Custom Track JSON
+            </h2>
+
+            <button id="closeJson">
+                ✕
+            </button>
+
+        </div>
+
+        <textarea
+            id="jsonInput"
+            class="w-full h-80 bg-slate-950 text-slate-200 rounded p-3 text-xs font-mono">
+        </textarea>
+
+        <div class="flex justify-end gap-2 mt-3">
+
+            <button
+                id="resetJson"
+                class="bg-slate-700 px-3 py-2 rounded text-xs">
+                Reset
+            </button>
+
+            <button
+                id="applyJson"
+                class="bg-sky-600 px-3 py-2 rounded text-xs">
+                Apply
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- HUMAN FEEDBACK DASHBOARD -->
+<!-- ========================================================= -->
+
+<div
+    id="feedbackModal"
+    class="feedback-modal">
+
+    <div class="feedback-dashboard">
+
+        <!-- HEADER -->
+
+        <div class="p-5 border-b border-slate-700/70">
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <div class="flex items-center gap-2">
+
+                        <div class="text-xl">
+                            👤
+                        </div>
+
+                        <div>
+
+                            <h2 class="font-bold text-lg">
+                                Human Feedback Dashboard
+                            </h2>
+
+                            <p class="text-[11px] text-slate-400">
+                                Community observations help improve disaster awareness
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <button
+                    id="closeFeedback"
+                    class="text-slate-400 hover:text-white text-xl">
+                    ✕
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- DASHBOARD STATISTICS -->
+
+        <div class="p-5">
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+
+                <div class="feedback-stat">
+
+                    <div class="text-[10px] text-slate-400">
+                        TOTAL REPORTS
+                    </div>
+
+                    <div
+                        id="totalFeedback"
+                        class="text-2xl font-bold text-sky-400 mt-1">
+                        0
+                    </div>
+
+                </div>
+
+                <div class="feedback-stat">
+
+                    <div class="text-[10px] text-slate-400">
+                        AVG SAFETY
+                    </div>
+
+                    <div
+                        id="averageSafety"
+                        class="text-2xl font-bold text-emerald-400 mt-1">
+                        —
+                    </div>
+
+                </div>
+
+                <div class="feedback-stat">
+
+                    <div class="text-[10px] text-slate-400">
+                        HIGH IMPACT
+                    </div>
+
+                    <div
+                        id="highImpact"
+                        class="text-2xl font-bold text-red-400 mt-1">
+                        0
+                    </div>
+
+                </div>
+
+                <div class="feedback-stat">
+
+                    <div class="text-[10px] text-slate-400">
+                        CURRENT FIX
+                    </div>
+
+                    <div
+                        id="feedbackLocation"
+                        class="text-sm font-bold text-sky-300 mt-2">
+                        T-48h
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FEEDBACK FORM -->
+
+            <div class="feedback-card p-5 mt-5">
+
+                <div class="flex items-center justify-between mb-4">
+
+                    <div>
+
+                        <h3 class="font-bold">
+                            Submit Human Observation
+                        </h3>
+
+                        <p class="text-[10px] text-slate-400 mt-1">
+                            Your observation can complement automated cyclone predictions.
+                        </p>
+
+                    </div>
+
+                    <span class="text-xl">
+                        📝
+                    </span>
+
+                </div>
+
+
+                <!-- SAFETY RATING -->
+
+                <div class="mb-5">
+
+                    <label class="text-xs font-semibold">
+                        How safe does the current area feel?
+                    </label>
+
+                    <div
+                        id="starRating"
+                        class="flex gap-1 mt-2">
+
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+
+                    </div>
+
+                    <div
+                        id="ratingText"
+                        class="text-[10px] text-slate-400 mt-1">
+                        Select a safety rating
+                    </div>
+
+                </div>
+
+
+                <!-- IMPACT CATEGORY -->
+
+                <div class="mb-5">
+
+                    <label class="text-xs font-semibold">
+                        What are you observing?
+                    </label>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactFlood"
+                                value="Flooding">
+
+                            <label for="impactFlood">
+                                🌊 Flooding
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactRoad"
+                                value="Road Damage">
+
+                            <label for="impactRoad">
+                                🛣️ Road Damage
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactPower"
+                                value="Power Outage">
+
+                            <label for="impactPower">
+                                ⚡ Power Outage
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactWind"
+                                value="Strong Winds">
+
+                            <label for="impactWind">
+                                💨 Strong Winds
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactRain"
+                                value="Heavy Rain">
+
+                            <label for="impactRain">
+                                🌧️ Heavy Rain
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactShelter"
+                                value="Shelter Issue">
+
+                            <label for="impactShelter">
+                                🛟 Shelter Issue
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactHospital"
+                                value="Healthcare Access">
+
+                            <label for="impactHospital">
+                                🏥 Healthcare
+                            </label>
+
+                        </div>
+
+                        <div class="feedback-category">
+
+                            <input
+                                type="radio"
+                                name="impact"
+                                id="impactOther"
+                                value="Other">
+
+                            <label for="impactOther">
+                                📍 Other
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OBSERVATION -->
+
+                <div class="mb-4">
+
+                    <label
+                        for="feedbackComment"
+                        class="text-xs font-semibold">
+                        Observation / Comment
+                    </label>
+
+                    <textarea
+                        id="feedbackComment"
+                        maxlength="500"
+                        placeholder="Describe what you are seeing or experiencing..."
+                        class="w-full mt-2 h-24 bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 outline-none focus:border-sky-500 resize-none">
+                    </textarea>
+
+                    <div class="flex justify-between mt-1">
+
+                        <span class="text-[10px] text-slate-500">
+                            Do not include personal or sensitive information.
+                        </span>
+
+                        <span
+                            id="charCount"
+                            class="text-[10px] text-slate-500">
+                            0/500
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOCATION INFO -->
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+
+                    <div>
+
+                        <label class="text-[10px] text-slate-400">
+                            CURRENT CYCLONE TIME
+                        </label>
+
+                        <div
+                            id="feedbackTime"
+                            class="bg-slate-950 border border-slate-700 rounded-lg p-2 mt-1 text-xs">
+                            T-48h
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <label class="text-[10px] text-slate-400">
+                            CYCLONE POSITION
+                        </label>
+
+                        <div
+                            id="feedbackCoords"
+                            class="bg-slate-950 border border-slate-700 rounded-lg p-2 mt-1 text-xs">
+                            14.20°N, 89.60°E
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex justify-end">
+
+                    <button
+                        id="submitFeedback"
+                        class="bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-lg text-xs font-bold">
+                        Submit Observation
+                    </button>
+
+                </div>
+
+                <div
+                    id="feedbackMessage"
+                    class="hidden mt-3 p-3 rounded-lg text-xs">
+                </div>
+
+            </div>
+
+
+            <!-- FEEDBACK ANALYTICS -->
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+
+                <div class="feedback-card p-4">
+
+                    <h3 class="font-bold text-sm mb-3">
+                        📊 Impact Reports
+                    </h3>
+
+                    <div
+                        id="impactStats"
+                        class="space-y-2">
+                    </div>
+
+                </div>
+
+
+                <div class="feedback-card p-4">
+
+                    <h3 class="font-bold text-sm mb-3">
+                        🧭 Human vs AI Signal
+                    </h3>
+
+                    <div class="text-[11px] text-slate-400 leading-relaxed">
+
+                        Human observations can provide additional ground-level
+                        context that automated models may not immediately capture.
+
+                    </div>
+
+                    <div class="mt-4 space-y-3">
+
+                        <div>
+
+                            <div class="flex justify-between text-[10px]">
+                                <span>
+                                    Automated Forecast
+                                </span>
+
+                                <span class="text-sky-300">
+                                    AI
+                                </span>
+                            </div>
+
+                            <div class="h-2 bg-slate-800 rounded-full mt-1">
+
+                                <div
+                                    class="h-2 bg-sky-500 rounded-full"
+                                    style="width:78%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div>
+
+                            <div class="flex justify-between text-[10px]">
+                                <span>
+                                    Human Observations
+                                </span>
+
+                                <span class="text-emerald-300">
+                                    Community
+                                </span>
+                            </div>
+
+                            <div class="h-2 bg-slate-800 rounded-full mt-1">
+
+                                <div
+                                    id="humanSignalBar"
+                                    class="h-2 bg-emerald-500 rounded-full"
+                                    style="width:5%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT FEEDBACK -->
+
+            <div class="feedback-card p-4 mt-5">
+
+                <div class="flex items-center justify-between mb-3">
+
+                    <h3 class="font-bold text-sm">
+                        🗣️ Recent Human Observations
+                    </h3>
+
+                    <button
+                        id="clearFeedback"
+                        class="text-[10px] text-red-400 hover:text-red-300">
+                        Clear Local Data
+                    </button>
+
+                </div>
+
+                <div id="recentFeedback">
+
+                    <div class="text-xs text-slate-500">
+                        No observations submitted yet.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const DEFAULT_DATASET = {
+
+    name:"CYCLONE DANA",
+
+    basin:"Bay of Bengal",
+
+    track:[
+
+        {
+            timestamp:"T-48h",
+            lat:14.2,
+            lon:89.6,
+            wind:65,
+            pressure:994,
+            landfallIn:48
+        },
+
+        {
+            timestamp:"T-42h",
+            lat:15.0,
+            lon:88.9,
+            wind:80,
+            pressure:988,
+            landfallIn:42
+        },
+
+        {
+            timestamp:"T-36h",
+            lat:15.8,
+            lon:88.1,
+            wind:95,
+            pressure:982,
+            landfallIn:36
+        },
+
+        {
+            timestamp:"T-30h",
+            lat:16.7,
+            lon:87.4,
+            wind:110,
+            pressure:976,
+            landfallIn:30
+        },
+
+        {
+            timestamp:"T-24h",
+            lat:17.6,
+            lon:86.8,
+            wind:125,
+            pressure:970,
+            landfallIn:24
+        },
+
+        {
+            timestamp:"T-18h",
+            lat:18.5,
+            lon:86.3,
+            wind:135,
+            pressure:964,
+            landfallIn:18
+        },
+
+        {
+            timestamp:"T-12h",
+            lat:19.5,
+            lon:85.9,
+            wind:145,
+            pressure:958,
+            landfallIn:12
+        },
+
+        {
+            timestamp:"T-6h",
+            lat:20.3,
+            lon:85.5,
+            wind:135,
+            pressure:962,
+            landfallIn:6
+        },
+
+        {
+            timestamp:"T-0h",
+            lat:21.0,
+            lon:85.3,
+            wind:115,
+            pressure:974,
+            landfallIn:0
+        }
+
+    ],
+
+    infrastructure:{
+
+        ports:[
+            {
+                name:"Paradip Port",
+                lat:20.27,
+                lon:86.70
+            },
+            {
+                name:"Dhamra Port",
+                lat:20.79,
+                lon:86.95
+            },
+            {
+                name:"Gopalpur Port",
+                lat:19.16,
+                lon:84.93
+            }
+        ],
+
+        shelters:[
+            {
+                name:"Kendrapara Shelter",
+                lat:20.50,
+                lon:86.42
+            },
+            {
+                name:"Bhadrak Shelter",
+                lat:21.06,
+                lon:86.50
+            },
+            {
+                name:"Puri Relief Center",
+                lat:19.81,
+                lon:85.83
+            }
+        ],
+
+        radars:[
+            {
+                name:"Paradip DWR",
+                lat:20.27,
+                lon:86.70
+            },
+            {
+                name:"Kolkata Met Hub",
+                lat:22.57,
+                lon:88.36
+            }
+        ]
+
+    }
+
+};
+
+let data = structuredClone(DEFAULT_DATASET);
+
+let playback = null;
+let speed = 1500;
+let liveTimer = null;
+
+
+/* MAP + BASEMAPS */
+
+const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+        maxZoom:19
+    }
+);
+
+const dark = L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    {
+        subdomains:"abcd",
+        maxZoom:20
+    }
+);
+
+const ocean = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
+    {
+        maxZoom:13
+    }
+);
+
+const clear = L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    {
+        subdomains:"abcd",
+        maxZoom:20
+    }
+);
+
+const map = L.map(
+    "map",
+    {
+        center:[20.3,85.8],
+        zoom:7,
+        layers:[satellite],
+        zoomControl:false
+    }
+);
+
+L.control.zoom({
+    position:"bottomright"
+}).addTo(map);
+
+
+function switchBase(key){
+
+    [satellite,dark,ocean,clear].forEach(x=>{
+
+        if(map.hasLayer(x)){
+            map.removeLayer(x);
+        }
+
+    });
+
+    ({
+        satellite,
+        dark,
+        ocean,
+        clear
+    }[key] || satellite).addTo(map);
+
+}
+
+
+document.querySelectorAll(".base").forEach(
+    b => b.onclick = () => switchBase(b.dataset.base)
+);
+
+
+/* USER MAP-LAYER DATA */
+
+const layers = {
+
+    roads:L.layerGroup(),
+    hospitals:L.layerGroup(),
+    shelters:L.layerGroup(),
+    power:L.layerGroup(),
+    water:L.layerGroup(),
+    coast:L.layerGroup(),
+    population:L.layerGroup(),
+    cyclone:L.layerGroup()
+
+};
+
+
+const roadData = [
+
+    [
+        [20.30,85.82],
+        [20.35,85.90],
+        [20.45,86.05]
+    ],
+
+    [
+        [20.25,85.82],
+        [20.05,85.83],
+        [19.81,85.83]
+    ],
+
+    [
+        [20.30,85.82],
+        [20.50,86.42],
+        [20.70,86.70]
+    ]
+
+];
+
+
+roadData.forEach(
+    r => L.polyline(
+        r,
+        {
+            color:"#f59e0b",
+            weight:4
+        }
+    ).addTo(layers.roads)
+);
+
+
+function labelledMarker(
+    lat,
+    lon,
+    name,
+    emoji,
+    cls,
+    group
+){
+
+    const ic = L.divIcon({
+
+        className:"map-label-icon",
+
+        html:`
+            <div class="map-pin ${cls}">
+                <span class="pin-icon">${emoji}</span>
+                <span>${name}</span>
+            </div>
+        `,
+
+        iconSize:null,
+        iconAnchor:[12,12]
+
+    });
+
+    L.marker(
+        [lat,lon],
+        {icon:ic}
+    )
+    .bindPopup(`<b>${emoji} ${name}</b>`)
+    .addTo(group);
+
+}
+
+
+labelledMarker(
+    20.30,
+    85.82,
+    "AIIMS Bhubaneswar",
+    "🏥",
+    "pin-hospital",
+    layers.hospitals
+);
+
+labelledMarker(
+    20.47,
+    85.88,
+    "SCB Medical College",
+    "🏥",
+    "pin-hospital",
+    layers.hospitals
+);
+
+labelledMarker(
+    19.81,
+    85.83,
+    "Puri Hospital",
+    "🏥",
+    "pin-hospital",
+    layers.hospitals
+);
+
+labelledMarker(
+    20.50,
+    86.42,
+    "Kendrapara Emergency Shelter",
+    "🛟",
+    "pin-shelter",
+    layers.shelters
+);
+
+labelledMarker(
+    21.06,
+    86.50,
+    "Bhadrak Emergency Shelter",
+    "🛟",
+    "pin-shelter",
+    layers.shelters
+);
+
+labelledMarker(
+    19.81,
+    85.83,
+    "Puri Relief Center",
+    "🛟",
+    "pin-shelter",
+    layers.shelters
+);
+
+labelledMarker(
+    20.27,
+    86.70,
+    "Paradip Substation",
+    "⚡",
+    "pin-power",
+    layers.power
+);
+
+labelledMarker(
+    20.30,
+    85.82,
+    "Bhubaneswar Power Grid",
+    "⚡",
+    "pin-power",
+    layers.power
+);
+
+labelledMarker(
+    20.50,
+    86.42,
+    "Kendrapara Grid",
+    "⚡",
+    "pin-power",
+    layers.power
+);
+
+labelledMarker(
+    20.30,
+    85.82,
+    "Bhubaneswar Water Facility",
+    "💧",
+    "pin-water",
+    layers.water
+);
+
+labelledMarker(
+    19.81,
+    85.83,
+    "Puri Water Facility",
+    "💧",
+    "pin-water",
+    layers.water
+);
+
+labelledMarker(
+    20.47,
+    85.88,
+    "Cuttack Water Facility",
+    "💧",
+    "pin-water",
+    layers.water
+);
+
+
+L.polyline(
+    [
+        [19.0,84.8],
+        [19.5,85.0],
+        [20.0,85.3],
+        [20.8,86.0],
+        [21.5,87.0]
+    ],
+    {
+        color:"#22d3ee",
+        weight:3
+    }
+).addTo(layers.coast);
+
+
+[
+    [20.30,85.82,400],
+    [20.47,85.88,300],
+    [19.81,85.83,250],
+    [20.50,86.42,180]
+]
+.forEach(
+    x => L.circle(
+        [x[0],x[1]],
+        {
+            radius:x[2]*100,
+            fillOpacity:.12,
+            weight:1
+        }
+    )
+    .bindPopup("👥 Population zone")
+    .addTo(layers.population)
+);
+
+
+Object.values(layers).forEach(
+    x => x.addTo(map)
+);
+
+map.removeLayer(layers.population);
+
+
+/* TRAJECTORY ENGINE */
+
+let tracker = {
+
+    index:0,
+    marker:null,
+    full:null,
+    traversed:null,
+    radius:null,
+    waypoints:L.layerGroup(),
+    ports:L.layerGroup(),
+    shelters:L.layerGroup(),
+    radars:L.layerGroup()
+
+};
+
+
+function icon(){
+
+    return L.divIcon({
+
+        className:"",
+
+        html:
+            '<div class="cyclone-pulse"></div>',
+
+        iconSize:[24,24],
+        iconAnchor:[12,12]
+
+    });
+
+}
+
+
+function category(w){
+
+    if(w >= 222)
+        return [
+            "SUCS",
+            "bg-purple-500/20 text-purple-300"
+        ];
+
+    if(w >= 166)
+        return [
+            "ESCS",
+            "bg-purple-500/20 text-purple-300"
+        ];
+
+    if(w >= 118)
+        return [
+            "VSCS",
+            "bg-red-500/20 text-red-300"
+        ];
+
+    if(w >= 88)
+        return [
+            "SCS",
+            "bg-orange-500/20 text-orange-300"
+        ];
+
+    if(w >= 62)
+        return [
+            "CS",
+            "bg-yellow-500/20 text-yellow-300"
+        ];
+
+    return [
+        "DD",
+        "bg-slate-500/20 text-slate-300"
+    ];
+
+}
+
+
+function bearing(a,b){
+
+    const dLon =
+        (b.lon-a.lon)*Math.PI/180;
+
+    const la1 =
+        a.lat*Math.PI/180;
+
+    const la2 =
+        b.lat*Math.PI/180;
+
+    const y =
+        Math.sin(dLon)*Math.cos(la2);
+
+    const x =
+        Math.cos(la1)*Math.sin(la2)
+        -
+        Math.sin(la1)*Math.cos(la2)*Math.cos(dLon);
+
+    let deg =
+        (
+            Math.atan2(y,x)*180/Math.PI
+            +360
+        )%360;
+
+    const dirs = [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW"
+    ];
+
+    return dirs[
+        Math.round(deg/45)%8
+    ];
+
+}
+
+
+function clearTrajectory(){
+
+    [
+        tracker.full,
+        tracker.traversed,
+        tracker.radius,
+        tracker.marker,
+        tracker.waypoints,
+        tracker.ports,
+        tracker.shelters,
+        tracker.radars
+    ]
+    .forEach(x => {
+
+        if(x && map.hasLayer(x)){
+            map.removeLayer(x);
+        }
+
+    });
+
+    tracker.waypoints=L.layerGroup();
+    tracker.ports=L.layerGroup();
+    tracker.shelters=L.layerGroup();
+    tracker.radars=L.layerGroup();
+
+}
+
+
+function renderTrajectory(){
+
+    clearTrajectory();
+
+    const pts =
+        data.track.map(
+            p => [p.lat,p.lon]
+        );
+
+    tracker.full =
+        L.polyline(
+            pts,
+            {
+                color:"#22d3ee",
+                weight:3,
+                dashArray:"8 8",
+                opacity:.8
+            }
+        ).addTo(map);
+
+
+    tracker.traversed =
+        L.polyline(
+            [],
+            {
+                color:"#ef4444",
+                weight:5
+            }
+        ).addTo(map);
+
+
+    data.track.forEach(
+        (p,i) => {
+
+            L.circleMarker(
+                [p.lat,p.lon],
+                {
+                    radius:4,
+                    color:"#f87171",
+                    fillColor:"#ef4444",
+                    fillOpacity:1
+                }
+            )
+            .bindTooltip(
+                `${p.timestamp}<br>Wind: ${p.wind} km/h`
+            )
+            .on(
+                "click",
+                () => jump(i)
+            )
+            .addTo(tracker.waypoints);
+
+        }
+    );
+
+
+    tracker.waypoints.addTo(map);
+
+
+    const addInfra =
+        (arr,group,emoji,cls) => {
+
+            arr.forEach(
+                p => {
+
+                    const ic =
+                        L.divIcon({
+
+                            className:"map-label-icon",
+
+                            html:`
+                                <div class="map-pin ${cls}">
+                                    <span class="pin-icon">
+                                        ${emoji}
+                                    </span>
+                                    <span>
+                                        ${p.name}
+                                    </span>
+                                </div>
+                            `,
+
+                            iconSize:null,
+                            iconAnchor:[12,12]
+
+                        });
+
+
+                    L.marker(
+                        [p.lat,p.lon],
+                        {icon:ic}
+                    )
+                    .bindPopup(
+                        `<b>${emoji} ${p.name}</b>`
+                    )
+                    .addTo(group);
+
+                }
+            );
+
+            group.addTo(map);
+
+        };
+
+
+    addInfra(
+        data.infrastructure?.ports || [],
+        tracker.ports,
+        "⚓",
+        "pin-port"
+    );
+
+    addInfra(
+        data.infrastructure?.shelters || [],
+        tracker.shelters,
+        "🛟",
+        "pin-shelter"
+    );
+
+    addInfra(
+        data.infrastructure?.radars || [],
+        tracker.radars,
+        "📡",
+        "pin-radar"
+    );
+
+
+    tracker.marker =
+        L.marker(
+            [
+                data.track[0].lat,
+                data.track[0].lon
+            ],
+            {
+                icon:icon()
+            }
+        ).addTo(map);
+
+
+    tracker.radius =
+        L.circle(
+            [
+                data.track[0].lat,
+                data.track[0].lon
+            ],
+            {
+                radius:50000,
+                color:"#ef4444",
+                fillColor:"#ef4444",
+                fillOpacity:.08
+            }
+        ).addTo(map);
+
+
+    jump(0);
+
+    map.fitBounds(
+        tracker.full.getBounds(),
+        {
+            padding:[80,80]
+        }
+    );
+
+}
+
+
+function jump(i){
+
+    tracker.index =
+        Math.max(
+            0,
+            Math.min(
+                i,
+                data.track.length-1
+            )
+        );
+
+    const p =
+        data.track[tracker.index];
+
+    tracker.marker.setLatLng(
+        [p.lat,p.lon]
+    );
+
+    tracker.radius
+        .setLatLng([p.lat,p.lon])
+        .setRadius(
+            Math.max(
+                25000,
+                p.wind*700
+            )
+        );
+
+    tracker.traversed.setLatLngs(
+        data.track
+        .slice(0,tracker.index+1)
+        .map(
+            x => [x.lat,x.lon]
+        )
+    );
+
+    timeSlider.value =
+        tracker.index;
+
+    timeDisplay.textContent =
+        p.timestamp;
+
+    updateTelemetry();
+
+}
+
+
+function updateTelemetry(){
+
+    const i =
+        tracker.index;
+
+    const p =
+        data.track[i];
+
+    const c =
+        category(p.wind);
+
+
+    stormName.textContent =
+        (data.name || "CUSTOM STORM")
+        .toUpperCase();
+
+
+    categoryEl.textContent =
+        c[0];
+
+    categoryEl.className =
+        `text-[10px] rounded px-2 py-1 ${c[1]}`;
+
+
+    wind.textContent =
+        p.wind;
+
+    pressure.textContent =
+        p.pressure || "—";
+
+
+    timestamp.textContent =
+        p.timestamp;
+
+
+    coords.textContent =
+        `${p.lat.toFixed(2)}°N, ${p.lon.toFixed(2)}°E`;
+
+
+    heading.textContent =
+        i
+        ? bearing(
+            data.track[i-1],
+            p
+        )
+        : "—";
+
+
+    landfall.textContent =
+        p.landfallIn === 0
+        ? "LANDFALL STRIKE IN PROGRESS / INLAND"
+        : `IN ~${p.landfallIn || 0} HOURS`;
+
+
+    sliderStart.textContent =
+        data.track[0].timestamp;
+
+    sliderEnd.textContent =
+        data.track[data.track.length-1].timestamp;
+
+
+    peak.textContent =
+        `Peak ${Math.max(
+            ...data.track.map(
+                x => x.wind
+            )
+        )} km/h`;
+
+
+    drawSpark();
+
+
+    addLog(
+        `Fix: ${p.lat.toFixed(2)}°N, ${p.lon.toFixed(2)}°E | Wind: ${p.wind} km/h (${p.timestamp})`
+    );
+
+
+    /* UPDATE HUMAN FEEDBACK LOCATION */
+
+    if(typeof updateFeedbackContext === "function"){
+        updateFeedbackContext();
+    }
+
+}
+
+
+function drawSpark(){
+
+    const c =
+        document.getElementById("spark");
+
+    const ctx =
+        c.getContext("2d");
+
+    const w =
+        c.width =
+        c.clientWidth*2;
+
+    const h =
+        c.height =
+        80*2;
+
+    ctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    const vals =
+        data.track.map(
+            x => x.wind
+        );
+
+    const max =
+        Math.max(...vals);
+
+    const min =
+        Math.min(...vals);
+
+
+    const X =
+        i =>
+            i*(w-20)/
+            (vals.length-1)+10;
+
+
+    const Y =
+        v =>
+            h-10
+            -
+            (v-min)/
+            Math.max(1,max-min)
+            *(h-20);
+
+
+    ctx.strokeStyle =
+        "#38bdf8";
+
+    ctx.lineWidth =
+        4;
+
+    ctx.beginPath();
+
+
+    vals.forEach(
+        (v,i) => {
+
+            if(i)
+                ctx.lineTo(
+                    X(i),
+                    Y(v)
+                );
+            else
+                ctx.moveTo(
+                    X(i),
+                    Y(v)
+                );
+
+        }
+    );
+
+    ctx.stroke();
+
+
+    vals.forEach(
+        (v,i) => {
+
+            ctx.beginPath();
+
+            ctx.arc(
+                X(i),
+                Y(v),
+                i===tracker.index
+                ?8
+                :4,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle =
+                i===tracker.index
+                ? "#ef4444"
+                : "#64748b";
+
+            ctx.fill();
+
+        }
+    );
+
+}
+
+
+function addLog(msg,hi=false){
+
+    const d =
+        document.createElement("div");
+
+    d.className =
+        hi
+        ? "text-sky-300"
+        : "text-slate-400";
+
+    d.textContent =
+        `[${new Date().toLocaleTimeString()}] ${msg}`;
+
+    log.appendChild(d);
+
+    log.scrollTop =
+        log.scrollHeight;
+
+}
+
+
+/* CONTROLS */
+
+const prevBtn =
+    document.getElementById("prevBtn");
+
+const nextBtn =
+    document.getElementById("nextBtn");
+
+const playBtn =
+    document.getElementById("playBtn");
+
+const histBtn =
+    document.getElementById("histBtn");
+
+const liveBtn =
+    document.getElementById("liveBtn");
+
+const jsonBtn =
+    document.getElementById("jsonBtn");
+
+const cycloneToggle =
+    document.getElementById("cycloneToggle");
+
+const feedStatus =
+    document.getElementById("feedStatus");
+
+const jsonModal =
+    document.getElementById("jsonModal");
+
+const jsonInput =
+    document.getElementById("jsonInput");
+
+const closeJson =
+    document.getElementById("closeJson");
+
+const resetJson =
+    document.getElementById("resetJson");
+
+const applyJson =
+    document.getElementById("applyJson");
+
+const logToggle =
+    document.getElementById("logToggle");
+
+
+const timeSlider =
+    document.getElementById("timeSlider");
+
+const timeDisplay =
+    document.getElementById("timeDisplay");
+
+
+const stormName =
+    document.getElementById("stormName");
+
+const categoryEl =
+    document.getElementById("category");
+
+const wind =
+    document.getElementById("wind");
+
+const pressure =
+    document.getElementById("pressure");
+
+const timestamp =
+    document.getElementById("timestamp");
+
+const coords =
+    document.getElementById("coords");
+
+const heading =
+    document.getElementById("heading");
+
+const landfall =
+    document.getElementById("landfall");
+
+const sliderStart =
+    document.getElementById("sliderStart");
+
+const sliderEnd =
+    document.getElementById("sliderEnd");
+
+const peak =
+    document.getElementById("peak");
+
+const log =
+    document.getElementById("log");
+
+
+function configure(){
+
+    timeSlider.max =
+        data.track.length-1;
+
+    timeSlider.value =
+        tracker.index;
+
+    sliderStart.textContent =
+        data.track[0].timestamp;
+
+    sliderEnd.textContent =
+        data.track[
+            data.track.length-1
+        ].timestamp;
+
+}
+
+
+timeSlider.oninput =
+    e => {
+
+        stop();
+
+        jump(
+            +e.target.value
+        );
+
+    };
+
+
+prevBtn.onclick =
+    () => {
+
+        stop();
+
+        jump(
+            tracker.index-1
+        );
+
+    };
+
+
+nextBtn.onclick =
+    () => {
+
+        stop();
+
+        jump(
+            tracker.index+1
+        );
+
+    };
+
+
+playBtn.onclick =
+    () =>
+        playback
+        ? stop()
+        : start();
+
+
+function start(){
+
+    playBtn.textContent =
+        "⏸";
+
+    playback =
+        setInterval(
+            () => {
+
+                jump(
+                    (tracker.index+1)
+                    %
+                    data.track.length
+                );
+
+            },
+            speed
+        );
+
+}
+
+
+function stop(){
+
+    clearInterval(
+        playback
+    );
+
+    playback =
+        null;
+
+    playBtn.textContent =
+        "▶";
+
+}
+
+
+document.querySelectorAll(".speed")
+.forEach(
+    b =>
+        b.onclick =
+        () => {
+
+            speed =
+                +b.dataset.speed;
+
+            document
+            .querySelectorAll(".speed")
+            .forEach(
+                x =>
+                    x.classList.remove(
+                        "bg-sky-500/20",
+                        "text-sky-300"
+                    )
+            );
+
+            b.classList.add(
+                "bg-sky-500/20",
+                "text-sky-300"
+            );
+
+            if(playback){
+
+                stop();
+
+                start();
+
+            }
+
+        }
+);
+
+
+/* LAYER TOGGLES */
+
+const toggleMap = {
+
+    roadsToggle:"roads",
+    hospitalToggle:"hospitals",
+    shelterToggle:"shelters",
+    powerToggle:"power",
+    waterToggle:"water",
+    coastToggle:"coast",
+    populationToggle:"population"
+
+};
+
+
+Object.entries(toggleMap)
+.forEach(
+    ([id,key]) => {
+
+        document
+        .getElementById(id)
+        .onchange =
+            e =>
+                e.target.checked
+                ? map.addLayer(
+                    layers[key]
+                )
+                : map.removeLayer(
+                    layers[key]
+                );
+
+    }
+);
+
+
+cycloneToggle.onchange =
+    e => {
+
+        if(e.target.checked){
+
+            tracker.full.addTo(map);
+            tracker.traversed.addTo(map);
+            tracker.waypoints.addTo(map);
+            tracker.marker.addTo(map);
+
+        }
+        else{
+
+            [
+                tracker.full,
+                tracker.traversed,
+                tracker.waypoints,
+                tracker.marker
+            ]
+            .forEach(
+                x =>
+                    map.removeLayer(x)
+            );
+
+        }
+
+    };
+
+
+document
+.getElementById("layer-ports")
+.onchange =
+    e =>
+        e.target.checked
+        ? tracker.ports.addTo(map)
+        : map.removeLayer(
+            tracker.ports
+        );
+
+
+document
+.getElementById("layer-shelters")
+.onchange =
+    e =>
+        e.target.checked
+        ? tracker.shelters.addTo(map)
+        : map.removeLayer(
+            tracker.shelters
+        );
+
+
+document
+.getElementById("layer-radars")
+.onchange =
+    e =>
+        e.target.checked
+        ? tracker.radars.addTo(map)
+        : map.removeLayer(
+            tracker.radars
+        );
+
+
+document
+.getElementById("layer-windcone")
+.onchange =
+    e =>
+        e.target.checked
+        ? tracker.radius.addTo(map)
+        : map.removeLayer(
+            tracker.radius
+        );
+
+
+/* LIVE SIMULATION */
+
+liveBtn.onclick =
+    () => {
+
+        stop();
+
+        histBtn.className =
+            "px-3 py-2 rounded-lg text-slate-300 text-xs";
+
+        liveBtn.className =
+            "px-3 py-2 rounded-lg bg-red-600 text-white text-xs";
+
+        feedStatus.textContent =
+            "LIVE SATELLITE FEED (SIMULATED)";
+
+
+        if(liveTimer)
+            clearInterval(
+                liveTimer
+            );
+
+
+        liveTimer =
+            setInterval(
+                () => {
+
+                    const last =
+                        data.track[
+                            data.track.length-1
+                        ];
+
+
+                    const p = {
+
+                        timestamp:
+                            `LIVE +${data.track.length*3}m`,
+
+                        lat:
+                            +(last.lat+.14)
+                            .toFixed(2),
+
+                        lon:
+                            +(last.lon-.07)
+                            .toFixed(2),
+
+                        wind:
+                            Math.max(
+                                55,
+                                Math.min(
+                                    180,
+                                    last.wind +
+                                    (
+                                        Math.random()>.5
+                                        ?5
+                                        :-5
+                                    )
+                                )
+                            ),
+
+                        pressure:
+                            Math.round(
+                                1012 -
+                                last.wind*.36
+                            ),
+
+                        landfallIn:
+                            Math.max(
+                                0,
+                                (last.landfallIn||1)-1
+                            )
+
+                    };
+
+
+                    data.track.push(p);
+
+                    configure();
+
+                    renderTrajectory();
+
+                    jump(
+                        data.track.length-1
+                    );
+
+                    addLog(
+                        "⚡ LIVE RADAR FIX RECEIVED",
+                        true
+                    );
+
+                },
+                3200
+            );
+
+    };
+
+
+histBtn.onclick =
+    () => {
+
+        if(liveTimer)
+            clearInterval(
+                liveTimer
+            );
+
+        liveTimer =
+            null;
+
+        histBtn.className =
+            "px-3 py-2 rounded-lg bg-sky-500 text-white text-xs";
+
+        liveBtn.className =
+            "px-3 py-2 rounded-lg text-slate-300 text-xs";
+
+        feedStatus.textContent =
+            "HISTORICAL TIMELINE MODE";
+
+        addLog(
+            "Switched to Historical Timeline."
+        );
+
+    };
+
+
+/* JSON */
+
+jsonBtn.onclick =
+    () => {
+
+        jsonInput.value =
+            JSON.stringify(
+                data,
+                null,
+                2
+            );
+
+        jsonModal.classList.remove(
+            "hidden"
+        );
+
+        jsonModal.classList.add(
+            "flex"
+        );
+
+    };
+
+
+closeJson.onclick =
+    () => {
+
+        jsonModal.classList.add(
+            "hidden"
+        );
+
+        jsonModal.classList.remove(
+            "flex"
+        );
+
+    };
+
+
+resetJson.onclick =
+    () =>
+        jsonInput.value =
+            JSON.stringify(
+                DEFAULT_DATASET,
+                null,
+                2
+            );
+
+
+applyJson.onclick =
+    () => {
+
+        try{
+
+            const parsed =
+                JSON.parse(
+                    jsonInput.value
+                );
+
+
+            if(
+                !Array.isArray(
+                    parsed.track
+                )
+                ||
+                !parsed.track.length
+            ){
+
+                throw Error(
+                    "track array is required"
+                );
+
+            }
+
+
+            data =
+                parsed;
+
+            stop();
+
+            renderTrajectory();
+
+            configure();
+
+            closeJson.click();
+
+            addLog(
+                `Imported ${parsed.name || "Custom Storm"}`,
+                true
+            );
+
+        }
+        catch(e){
+
+            alert(
+                "Invalid JSON: "
+                + e.message
+            );
+
+        }
+
+    };
+
+
+logToggle.onclick =
+    () =>
+        log.classList.toggle(
+            "hidden"
+        );
+
+
+/* BACKEND */
+
+const API_BASE_URL =
+    "http://127.0.0.1:8000";
+
+
+async function loadBackendData(){
+
+    try{
+
+        const r =
+            await fetch(
+                `${API_BASE_URL}/routing`
+            );
+
+
+        if(!r.ok)
+            throw Error(
+                `Routing API ${r.status}`
+            );
+
+
+        const routing =
+            await r.json();
+
+
+        console.log(
+            "Routing data:",
+            routing
+        );
+
+
+        const a =
+            await fetch(
+                `${API_BASE_URL}/advisory`
+            );
+
+
+        if(!a.ok)
+            throw Error(
+                `Advisory API ${a.status}`
+            );
+
+
+        const advisory =
+            await a.json();
+
+
+        document
+        .getElementById("ai-advisory")
+        .textContent =
+            advisory.advisory
+            ||
+            "No advisory available.";
+
+
+        addLog(
+            "Backend routing + Gemini advisory synchronized.",
+            true
+        );
+
+    }
+    catch(e){
+
+        document
+        .getElementById("ai-advisory")
+        .textContent =
+            "Backend connection unavailable.";
+
+
+        addLog(
+            `Backend connection error: ${e.message}`,
+            true
+        );
+
+    }
+
+}
+
+
+/* ========================================================= */
+/* HUMAN FEEDBACK DASHBOARD */
+/* ========================================================= */
+
+
+const feedbackBtn =
+    document.getElementById(
+        "feedbackBtn"
+    );
+
+
+const feedbackModal =
+    document.getElementById(
+        "feedbackModal"
+    );
+
+
+const closeFeedback =
+    document.getElementById(
+        "closeFeedback"
+    );
+
+
+const submitFeedback =
+    document.getElementById(
+        "submitFeedback"
+    );
+
+
+const feedbackComment =
+    document.getElementById(
+        "feedbackComment"
+    );
+
+
+const charCount =
+    document.getElementById(
+        "charCount"
+    );
+
+
+const feedbackMessage =
+    document.getElementById(
+        "feedbackMessage"
+    );
+
+
+const ratingText =
+    document.getElementById(
+        "ratingText"
+    );
+
+
+const totalFeedback =
+    document.getElementById(
+        "totalFeedback"
+    );
+
+
+const averageSafety =
+    document.getElementById(
+        "averageSafety"
+    );
+
+
+const highImpact =
+    document.getElementById(
+        "highImpact"
+    );
+
+
+const feedbackLocation =
+    document.getElementById(
+        "feedbackLocation"
+    );
+
+
+const feedbackTime =
+    document.getElementById(
+        "feedbackTime"
+    );
+
+
+const feedbackCoords =
+    document.getElementById(
+        "feedbackCoords"
+    );
+
+
+const recentFeedback =
+    document.getElementById(
+        "recentFeedback"
+    );
+
+
+const impactStats =
+    document.getElementById(
+        "impactStats"
+    );
+
+
+const humanSignalBar =
+    document.getElementById(
+        "humanSignalBar"
+    );
+
+
+let selectedRating = 0;
+
+
+/* OPEN DASHBOARD */
+
+feedbackBtn.onclick =
+    () => {
+
+        feedbackModal.classList.add(
+            "active"
+        );
+
+        updateFeedbackDashboard();
+
+        updateFeedbackContext();
+
+    };
+
+
+/* CLOSE DASHBOARD */
+
+closeFeedback.onclick =
+    () => {
+
+        feedbackModal.classList.remove(
+            "active"
+        );
+
+    };
+
+
+feedbackModal.addEventListener(
+    "click",
+    e => {
+
+        if(
+            e.target === feedbackModal
+        ){
+
+            feedbackModal.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+);
+
+
+/* ESCAPE TO CLOSE */
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        if(
+            e.key === "Escape"
+        ){
+
+            feedbackModal.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+);
+
+
+/* STAR RATING */
+
+document
+.querySelectorAll(".star")
+.forEach(
+    star => {
+
+        star.addEventListener(
+            "click",
+            () => {
+
+                selectedRating =
+                    Number(
+                        star.dataset.rating
+                    );
+
+
+                document
+                .querySelectorAll(".star")
+                .forEach(
+                    s => {
+
+                        const value =
+                            Number(
+                                s.dataset.rating
+                            );
+
+                        if(
+                            value <= selectedRating
+                        ){
+
+                            s.classList.add(
+                                "active"
+                            );
+
+                        }
+                        else{
+
+                            s.classList.remove(
+                                "active"
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                const ratingLabels = {
+
+                    1:"Very unsafe",
+                    2:"Unsafe",
+                    3:"Moderate",
+                    4:"Mostly safe",
+                    5:"Very safe"
+
+                };
+
+
+                ratingText.textContent =
+                    ratingLabels[
+                        selectedRating
+                    ];
+
+            }
+        );
+
+    }
+);
+
+
+/* CHARACTER COUNTER */
+
+feedbackComment.addEventListener(
+    "input",
+    () => {
+
+        charCount.textContent =
+            `${feedbackComment.value.length}/500`;
+
+    }
+);
+
+
+/* GET LOCAL FEEDBACK */
+
+function getFeedback(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(
+                "cycloneHumanFeedback"
+            )
+        ) || [];
+
+    }
+    catch{
+
+        return [];
+
+    }
+
+}
+
+
+/* SAVE FEEDBACK */
+
+function saveFeedback(feedback){
+
+    localStorage.setItem(
+        "cycloneHumanFeedback",
+        JSON.stringify(
+            feedback
+        )
+    );
+
+}
+
+
+/* CURRENT MAP CONTEXT */
+
+function updateFeedbackContext(){
+
+    if(
+        !data.track ||
+        !data.track.length
+    ){
+
+        return;
+
+    }
+
+
+    const p =
+        data.track[
+            tracker.index
+        ];
+
+
+    feedbackLocation.textContent =
+        p.timestamp;
+
+
+    feedbackTime.textContent =
+        p.timestamp;
+
+
+    feedbackCoords.textContent =
+        `${p.lat.toFixed(2)}°N, ${p.lon.toFixed(2)}°E`;
+
+}
+
+
+/* SUBMIT FEEDBACK */
+
+submitFeedback.onclick =
+    () => {
+
+        const impact =
+            document.querySelector(
+                'input[name="impact"]:checked'
+            );
+
+
+        const comment =
+            feedbackComment.value.trim();
+
+
+        if(!selectedRating){
+
+            showFeedbackMessage(
+                "Please select a safety rating.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if(!impact){
+
+            showFeedbackMessage(
+                "Please select an impact category.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if(!comment){
+
+            showFeedbackMessage(
+                "Please enter a short observation.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const p =
+            data.track[
+                tracker.index
+            ];
+
+
+        const feedback = {
+
+            id:
+                Date.now(),
+
+            storm:
+                data.name ||
+                "CUSTOM STORM",
+
+            timestamp:
+                p.timestamp,
+
+            lat:
+                p.lat,
+
+            lon:
+                p.lon,
+
+            wind:
+                p.wind,
+
+            safetyRating:
+                selectedRating,
+
+            impact:
+                impact.value,
+
+            comment:
+                comment,
+
+            submittedAt:
+                new Date().toISOString()
+
+        };
+
+
+        const feedbackList =
+            getFeedback();
+
+
+        feedbackList.unshift(
+            feedback
+        );
+
+
+        saveFeedback(
+            feedbackList
+        );
+
+
+        addLog(
+            "👤 Human observation submitted.",
+            true
+        );
+
+
+        showFeedbackMessage(
+            "Observation submitted successfully.",
+            "success"
+        );
+
+
+        resetFeedbackForm();
+
+        updateFeedbackDashboard();
+
+    };
+
+
+/* FEEDBACK MESSAGE */
+
+function showFeedbackMessage(
+    message,
+    type
+){
+
+    feedbackMessage.classList.remove(
+        "hidden"
+    );
+
+    feedbackMessage.className =
+        "mt-3 p-3 rounded-lg text-xs";
+
+
+    if(type === "success"){
+
+        feedbackMessage.classList.add(
+            "bg-emerald-500/10",
+            "border",
+            "border-emerald-500/30",
+            "text-emerald-300",
+            "feedback-success"
+        );
+
+    }
+    else{
+
+        feedbackMessage.classList.add(
+            "bg-red-500/10",
+            "border",
+            "border-red-500/30",
+            "text-red-300"
+        );
+
+    }
+
+
+    feedbackMessage.textContent =
+        message;
+
+
+    setTimeout(
+        () => {
+
+            feedbackMessage.classList.add(
+                "hidden"
+            );
+
+        },
+        3500
+    );
+
+}
+
+
+/* RESET FORM */
+
+function resetFeedbackForm(){
+
+    selectedRating = 0;
+
+
+    document
+    .querySelectorAll(".star")
+    .forEach(
+        s =>
+            s.classList.remove(
+                "active"
+            )
+    );
+
+
+    document
+    .querySelectorAll(
+        'input[name="impact"]'
+    )
+    .forEach(
+        input =>
+            input.checked = false
+    );
+
+
+    feedbackComment.value =
+        "";
+
+
+    charCount.textContent =
+        "0/500";
+
+
+    ratingText.textContent =
+        "Select a safety rating";
+
+}
+
+
+/* UPDATE DASHBOARD */
+
+function updateFeedbackDashboard(){
+
+    const feedbackList =
+        getFeedback();
+
+
+    totalFeedback.textContent =
+        feedbackList.length;
+
+
+    if(!feedbackList.length){
+
+        averageSafety.textContent =
+            "—";
+
+        highImpact.textContent =
+            "0";
+
+        humanSignalBar.style.width =
+            "5%";
+
+        renderImpactStats(
+            feedbackList
+        );
+
+        renderRecentFeedback(
+            feedbackList
+        );
+
+        return;
+
+    }
+
+
+    const average =
+        feedbackList.reduce(
+            (sum,item) =>
+                sum + item.safetyRating,
+            0
+        )
+        /
+        feedbackList.length;
+
+
+    averageSafety.textContent =
+        average.toFixed(1)
+        + "/5";
+
+
+    const highImpactCount =
+        feedbackList.filter(
+            item =>
+                item.safetyRating <= 2
+        ).length;
+
+
+    highImpact.textContent =
+        highImpactCount;
+
+
+    const signal =
+        Math.min(
+            100,
+            5 +
+            feedbackList.length*5
+        );
+
+
+    humanSignalBar.style.width =
+        `${signal}%`;
+
+
+    renderImpactStats(
+        feedbackList
+    );
+
+
+    renderRecentFeedback(
+        feedbackList
+    );
+
+}
+
+
+/* IMPACT STATISTICS */
+
+function renderImpactStats(
+    feedbackList
+){
+
+    impactStats.innerHTML =
+        "";
+
+
+    if(!feedbackList.length){
+
+        impactStats.innerHTML = `
+            <div class="text-xs text-slate-500">
+                No impact reports yet.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const counts = {};
+
+
+    feedbackList.forEach(
+        item => {
+
+            counts[item.impact] =
+                (counts[item.impact] || 0)
+                +1;
+
+        }
+    );
+
+
+    const sorted =
+        Object.entries(counts)
+        .sort(
+            (a,b) =>
+                b[1]-a[1]
+        );
+
+
+    const max =
+        sorted[0][1];
+
+
+    sorted.forEach(
+        ([name,count]) => {
+
+            const percentage =
+                Math.round(
+                    count/max*100
+                );
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.innerHTML = `
+
+                <div class="flex justify-between text-[10px] mb-1">
+
+                    <span>
+                        ${name}
+                    </span>
+
+                    <span class="text-slate-400">
+                        ${count}
+                    </span>
+
+                </div>
+
+                <div class="h-2 bg-slate-800 rounded-full">
+
+                    <div
+                        class="h-2 bg-sky-500 rounded-full"
+                        style="width:${percentage}%">
+                    </div>
+
+                </div>
+
+            `;
+
+
+            impactStats.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* RECENT FEEDBACK */
+
+function renderRecentFeedback(
+    feedbackList
+){
+
+    recentFeedback.innerHTML =
+        "";
+
+
+    if(!feedbackList.length){
+
+        recentFeedback.innerHTML = `
+            <div class="text-xs text-slate-500">
+                No observations submitted yet.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    feedbackList
+    .slice(0,8)
+    .forEach(
+        item => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "feedback-item";
+
+
+            const date =
+                new Date(
+                    item.submittedAt
+                );
+
+
+            div.innerHTML = `
+
+                <div class="flex justify-between gap-2">
+
+                    <div>
+
+                        <div class="text-xs font-bold text-sky-300">
+
+                            ${item.impact}
+
+                        </div>
+
+                        <div class="text-[10px] text-slate-400 mt-1">
+
+                            ${item.timestamp}
+                            •
+                            ${item.wind} km/h
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-yellow-400 text-xs">
+
+                        ${"★".repeat(item.safetyRating)}
+                        ${"☆".repeat(5-item.safetyRating)}
+
+                    </div>
+
+                </div>
+
+                <div class="text-xs text-slate-300 mt-2">
+
+                    ${escapeHtml(item.comment)}
+
+                </div>
+
+                <div class="text-[9px] text-slate-500 mt-2">
+
+                    Submitted ${date.toLocaleString()}
+
+                </div>
+
+            `;
+
+
+            recentFeedback.appendChild(
+                div
+            );
+
+        }
+    );
+
+}
+
+
+/* BASIC HTML ESCAPING */
+
+function escapeHtml(text){
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+
+/* CLEAR LOCAL FEEDBACK */
+
+document
+.getElementById("clearFeedback")
+.onclick =
+    () => {
+
+        const feedbackList =
+            getFeedback();
+
+
+        if(!feedbackList.length){
+
+            return;
+
+        }
+
+
+        const confirmed =
+            confirm(
+                "Clear all locally stored human feedback?"
+            );
+
+
+        if(!confirmed){
+
+            return;
+
+        }
+
+
+        localStorage.removeItem(
+            "cycloneHumanFeedback"
+        );
+
+
+        updateFeedbackDashboard();
+
+
+        addLog(
+            "Human feedback data cleared.",
+            true
+        );
+
+    };
+
+
+/* INIT */
+
+renderTrajectory();
+
+configure();
+
+loadBackendData();
+
+updateFeedbackDashboard();
+
+updateFeedbackContext();
+
+</script>
+
+</body>
+</html>
