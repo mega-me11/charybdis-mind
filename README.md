@@ -1,10 +1,10 @@
-# Cyclone Impact Forecaster
+# Charybdis Mind
 
-**Team PromptForge
+~Team PromptForge
 
-**An AI-powered disaster decision-support system for understanding, predicting, and responding to cyclone-related impacts on people, roads, and critical infrastructure before and during landfall.**
+**Turning the chaos of the storm into predictive clarity**
 
-Cyclone Impact Forecaster combines **Google Earth Engine geospatial intelligence, machine learning, disaster-aware routing, Google Gemini, and an interactive cyclone timeline** to transform environmental and infrastructure data into actionable disaster insights.
+Charybdis Mind is an AI-powered disaster decision-support system for understanding, predicting, and responding to cyclone-related impacts on people, roads, and critical infrastructure before and during landfall. It combines **Google Earth Engine geospatial intelligence, machine learning, disaster-aware routing, Google Gemini, and an interactive cyclone timeline** to transform environmental and infrastructure data into actionable disaster insights.
 
 ## Demo
 
