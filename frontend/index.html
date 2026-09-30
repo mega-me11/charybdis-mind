@@ -1275,13 +1275,13 @@ const baseLayers = {
         }
     ),
 
-    dark:L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        {
-            attribution:"© OpenStreetMap © CARTO",
-            maxZoom:19
-        }
-    ),
+    dark: L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+    }
+),
 
     ocean:L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
@@ -1291,13 +1291,13 @@ const baseLayers = {
         }
     ),
 
-    clear:L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        {
-            attribution:"© OpenStreetMap © CARTO",
-            maxZoom:19
-        }
-    )
+    clear: L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+    }
+)
 };
 
 baseLayers.dark.addTo(map);
