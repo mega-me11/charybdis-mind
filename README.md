@@ -8,7 +8,7 @@ Charybdis Mind is an AI-powered disaster decision-support system for understandi
 
 ## Demo
 
-Live demo: [link]
+Live demo: https://charybdis-mind.vercel.app/
 
 Demo video: [link]
 
