@@ -3,206 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Charybdis Mind</title>
+<title>Charybdis Mind | Cyclone Impact Forecaster</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.tailwindcss.com"></script>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-*{box-sizing:border-box}
-
-body{
-    margin:0;
-    background:#020617;
-    color:#e2e8f0;
-    font-family:Inter,Arial,sans-serif
+*{
+    box-sizing:border-box;
 }
 
-#map{
-    height:calc(100vh - 64px);
-    width:100%
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background:#020617;
+    color:#e2e8f0;
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
+    overflow:hidden;
+}
+
+button{
+    cursor:pointer;
 }
 
 .glass{
-    background:rgba(2,6,23,.88);
-    backdrop-filter:blur(12px);
-    border:1px solid rgba(148,163,184,.18)
+    background:rgba(15,23,42,.84);
+    border:1px solid rgba(148,163,184,.16);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
-.panel{
-    box-shadow:0 10px 30px rgba(0,0,0,.35)
+.panel-title{
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.12em;
+    color:#94a3b8;
+    text-transform:uppercase;
 }
 
-.small{
-    font-size:11px
+.small-label{
+    font-size:10px;
+    color:#64748b;
+    text-transform:uppercase;
+    letter-spacing:.08em;
 }
 
-::-webkit-scrollbar{
-    width:6px
-}
-
-::-webkit-scrollbar-thumb{
-    background:#475569;
-    border-radius:8px
-}
-
-.cyclone-pulse{
-    width:24px;
-    height:24px;
-    border-radius:50%;
-    background:#ef4444;
-    border:3px solid white;
-    box-shadow:
-        0 0 0 8px rgba(239,68,68,.18),
-        0 0 24px #ef4444
-}
-
-.map-label-icon{
-    background:transparent;
-    border:0
-}
-
-.map-pin{
-    display:flex;
-    align-items:center;
-    gap:5px;
-    white-space:nowrap;
+.small-value{
     font-size:12px;
+    color:#e2e8f0;
     font-weight:700;
-    color:#fff;
-    text-shadow:0 1px 3px #000,0 0 4px #000;
-    pointer-events:none
 }
 
-.pin-icon{
-    width:25px;
-    height:25px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:2px solid #fff;
-    box-shadow:0 2px 7px rgba(0,0,0,.55)
+#map{
+    width:100%;
+    height:100%;
+    background:#06101d;
 }
 
-.pin-hospital .pin-icon{background:#dc2626}
-.pin-shelter .pin-icon{background:#16a34a}
-.pin-power .pin-icon{background:#eab308}
-.pin-water .pin-icon{background:#0284c7}
-.pin-port .pin-icon{background:#7c3aed}
-.pin-radar .pin-icon{background:#0891b2}
+.leaflet-control-zoom a{
+    background:#0f172a!important;
+    color:#e2e8f0!important;
+    border-color:#334155!important;
+}
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip{
     background:#0f172a;
-    color:#e2e8f0
+    color:#e2e8f0;
 }
 
-/* HUMAN FEEDBACK DASHBOARD */
+.leaflet-popup-content{
+    font-size:12px;
+}
 
-.feedback-modal{
+.cyclone-marker{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#ef4444;
+    border:3px solid white;
+    box-shadow:
+        0 0 0 5px rgba(239,68,68,.25),
+        0 0 25px rgba(239,68,68,.8);
+}
+
+.start-marker{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#22c55e;
+    border:2px solid white;
+}
+
+.end-marker{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#f59e0b;
+    border:2px solid white;
+}
+
+.route-start{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#22c55e;
+    border:2px solid white;
+}
+
+.route-end{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#f59e0b;
+    border:2px solid white;
+}
+
+::-webkit-scrollbar{
+    width:5px;
+    height:5px;
+}
+
+::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:10px;
+}
+
+.timeline-range{
+    accent-color:#38bdf8;
+}
+
+.badge{
+    font-size:9px;
+    font-weight:800;
+    padding:3px 7px;
+    border-radius:5px;
+    letter-spacing:.05em;
+}
+
+.badge-green{
+    background:rgba(34,197,94,.12);
+    color:#4ade80;
+    border:1px solid rgba(34,197,94,.2);
+}
+
+.badge-yellow{
+    background:rgba(234,179,8,.12);
+    color:#facc15;
+    border:1px solid rgba(234,179,8,.2);
+}
+
+.badge-red{
+    background:rgba(239,68,68,.12);
+    color:#f87171;
+    border:1px solid rgba(239,68,68,.2);
+}
+
+.badge-blue{
+    background:rgba(59,130,246,.12);
+    color:#60a5fa;
+    border:1px solid rgba(59,130,246,.2);
+}
+
+.icon-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(148,163,184,.15);
+    background:rgba(15,23,42,.8);
+    color:#cbd5e1;
+    border-radius:7px;
+    transition:.2s;
+}
+
+.icon-btn:hover{
+    background:#1e293b;
+    color:white;
+}
+
+.toggle-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:6px 0;
+}
+
+.toggle{
+    width:32px;
+    height:17px;
+    border-radius:20px;
+    background:#334155;
+    position:relative;
+    transition:.2s;
+}
+
+.toggle.active{
+    background:#0284c7;
+}
+
+.toggle span{
+    position:absolute;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:white;
+    top:2px;
+    left:2px;
+    transition:.2s;
+}
+
+.toggle.active span{
+    left:17px;
+}
+
+.stat-card{
+    background:rgba(2,6,23,.45);
+    border:1px solid rgba(148,163,184,.1);
+    border-radius:8px;
+    padding:8px;
+}
+
+.modal{
     position:fixed;
     inset:0;
     background:rgba(0,0,0,.72);
-    z-index:3000;
+    z-index:10000;
     display:none;
     align-items:center;
     justify-content:center;
-    padding:20px
+    padding:20px;
 }
 
-.feedback-modal.active{
-    display:flex
+.modal.show{
+    display:flex;
 }
 
-.feedback-dashboard{
-    width:95%;
-    max-width:900px;
+.modal-box{
+    width:min(700px,100%);
     max-height:90vh;
-    overflow-y:auto;
-    background:rgba(2,6,23,.97);
-    border:1px solid rgba(56,189,248,.25);
-    border-radius:18px;
-    box-shadow:0 20px 60px rgba(0,0,0,.65)
-}
-
-.feedback-card{
-    background:rgba(15,23,42,.8);
-    border:1px solid rgba(148,163,184,.15);
-    border-radius:12px
-}
-
-.feedback-stat{
-    background:rgba(15,23,42,.75);
-    border:1px solid rgba(148,163,184,.12);
-    border-radius:12px;
-    padding:14px
-}
-
-.feedback-category{
-    cursor:pointer;
-    transition:.2s
-}
-
-.feedback-category:hover{
-    transform:translateY(-1px)
-}
-
-.feedback-category input{
-    display:none
-}
-
-.feedback-category label{
-    display:block;
-    cursor:pointer;
-    padding:10px;
-    border-radius:10px;
+    overflow:auto;
     background:#0f172a;
     border:1px solid #334155;
-    text-align:center;
-    font-size:12px;
-    transition:.2s
+    border-radius:14px;
+    box-shadow:0 25px 70px rgba(0,0,0,.5);
 }
 
-.feedback-category input:checked + label{
-    background:rgba(14,165,233,.18);
-    border-color:#38bdf8;
-    color:#7dd3fc
-}
-
-.star{
-    cursor:pointer;
-    font-size:27px;
-    transition:.15s;
-    color:#475569
-}
-
-.star.active{
-    color:#facc15
-}
-
-.feedback-item{
-    border-left:3px solid #38bdf8;
-    background:rgba(15,23,42,.65);
-    padding:10px;
+.radio-option{
+    border:1px solid #334155;
     border-radius:8px;
-    margin-bottom:8px
+    padding:8px;
+    cursor:pointer;
 }
 
-.feedback-success{
-    animation:feedbackSuccess .3s ease
+.radio-option:hover{
+    border-color:#64748b;
 }
 
-@keyframes feedbackSuccess{
-    from{
-        transform:scale(.96);
-        opacity:.5
+.feedback-star{
+    font-size:28px;
+    color:#475569;
+    cursor:pointer;
+}
+
+.feedback-star.active{
+    color:#facc15;
+}
+
+@media(max-width:1000px){
+    .desktop-sidebar{
+        display:none!important;
     }
-    to{
-        transform:scale(1);
-        opacity:1
+}
+
+@media(max-width:700px){
+    header .desktop-only{
+        display:none!important;
+    }
+
+    #mobileInfo{
+        display:block!important;
     }
 }
 </style>
@@ -210,119 +308,121 @@ body{
 
 <body>
 
-<header class="h-16 glass flex items-center justify-between px-4 z-[1000] relative">
+<!-- HEADER -->
+<header class="absolute top-0 left-0 right-0 z-[5000] h-[58px] glass flex items-center justify-between px-4">
 
-    <div>
-        <div class="font-bold text-lg">
-            🌪️ Charybdis Mind
-            <span
-                id="backendBadge"
-                class="text-[10px] px-2 py-1 rounded bg-slate-700 text-slate-300"
-            >
-                BACKEND: OFFLINE
-            </span>
+    <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-400/20 flex items-center justify-center">
+            <i data-lucide="waves" class="w-5 h-5 text-sky-400"></i>
         </div>
 
-        <div class="text-[10px] text-slate-400">
-            TRACK BASED INFRASTRUCTURE VULNERABILITY
+        <div>
+            <div class="font-black tracking-wide text-sm text-white">
+                CHARYBDIS MIND
+            </div>
+            <div class="text-[9px] text-slate-500 tracking-[.18em] uppercase">
+                Cyclone Impact Forecaster
+            </div>
         </div>
     </div>
 
     <div class="flex items-center gap-2">
+        <div
+            id="backendBadge"
+            class="badge badge-yellow"
+        >
+            BACKEND: CONNECTING
+        </div>
 
-        <button
-            id="histBtn"
-            class="px-3 py-2 rounded-lg bg-sky-500 text-white text-xs font-bold">
-            TIMELINE
+        <button id="histBtn" class="icon-btn w-8 h-8" title="History">
+            <i data-lucide="history" class="w-4 h-4"></i>
         </button>
 
-        <button
-            id="liveBtn"
-            class="px-3 py-2 rounded-lg text-slate-300 text-xs">
-            LIVE SIMULATION
+        <button id="liveBtn" class="icon-btn w-8 h-8" title="Live simulation">
+            <i data-lucide="radio" class="w-4 h-4"></i>
         </button>
 
-        <button
-            id="jsonBtn"
-            class="px-3 py-2 rounded-lg bg-slate-800 text-xs">
-            CUSTOM JSON
+        <button id="jsonBtn" class="icon-btn w-8 h-8" title="Load cyclone JSON">
+            <i data-lucide="file-json" class="w-4 h-4"></i>
         </button>
 
-        <!-- HUMAN FEEDBACK BUTTON -->
-        <button
-            id="feedbackBtn"
-            class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
-            👤 HUMAN FEEDBACK
+        <button id="feedbackBtn" class="icon-btn w-8 h-8" title="Human feedback">
+            <i data-lucide="message-square-more" class="w-4 h-4"></i>
         </button>
-
     </div>
 </header>
 
-<div class="relative">
 
+<!-- MAP -->
 <div id="map"></div>
 
-<!-- LEFT MAP LAYERS -->
 
-<aside class="absolute top-4 left-4 w-64 glass panel rounded-xl p-4 z-[500] max-h-[calc(100vh-90px)] overflow-y-auto">
+<!-- LEFT SIDEBAR -->
+<aside class="desktop-sidebar absolute left-3 top-[70px] bottom-3 z-[4000] w-[270px] overflow-y-auto glass rounded-xl p-3">
 
-    <h2 class="font-bold mb-1">
+    <div class="panel-title mb-3">
         Map Layers
-    </h2>
+    </div>
 
-    <p class="text-[10px] text-slate-400 mb-3">
-        Toggle physical infrastructure
-    </p>
+    <div class="space-y-1">
 
-    <div class="space-y-2 text-sm">
+        <div class="toggle-row">
+            <span class="text-xs">Road Network</span>
+            <button class="toggle active" data-layer="roads"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="roadsToggle" checked>
-            🛣️ Roads
-        </label><br>
+        <div class="toggle-row">
+            <span class="text-xs">Hospitals</span>
+            <button class="toggle active" data-layer="hospitals"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="hospitalToggle" checked>
-            🏥 Hospitals
-        </label><br>
+        <div class="toggle-row">
+            <span class="text-xs">Shelters</span>
+            <button class="toggle active" data-layer="shelters"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="shelterToggle" checked>
-            🛟 Emergency Shelters
-        </label><br>
+        <div class="toggle-row">
+            <span class="text-xs">Power Infrastructure</span>
+            <button class="toggle" data-layer="power"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="powerToggle" checked>
-            ⚡ Power Infrastructure
-        </label><br>
+        <div class="toggle-row">
+            <span class="text-xs">Water Infrastructure</span>
+            <button class="toggle" data-layer="water"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="waterToggle" checked>
-            💧 Water Facilities
-        </label><br>
+        <div class="toggle-row">
+            <span class="text-xs">Coastline</span>
+            <button class="toggle active" data-layer="coast"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="coastToggle" checked>
-            🌊 Coastline
-        </label><br>
+        <div class="toggle-row">
+            <span class="text-xs">Population</span>
+            <button class="toggle" data-layer="population"><span></span></button>
+        </div>
 
-        <label>
-            <input type="checkbox" id="populationToggle">
-            👥 Population
-        </label><br>
-
-        <label>
-            <input type="checkbox" id="cycloneToggle" checked>
-            🌪️ Cyclone Track
-        </label>
+        <div class="toggle-row">
+            <span class="text-xs">Cyclone Track</span>
+            <button class="toggle active" data-layer="cyclone"><span></span></button>
+        </div>
 
     </div>
 
-    <hr class="border-slate-700 my-4">
+    <div class="border-t border-slate-700/50 my-4"></div>
 
-    <h3 class="font-semibold text-sm mb-2">
-        Trajectory Timeline
-    </h3>
+    <div class="panel-title mb-3">
+        Cyclone Timeline
+    </div>
+
+    <div class="flex justify-between mb-2">
+        <span id="timelineLabel" class="text-xs font-bold text-sky-400">
+            T-48h
+        </span>
+
+        <span id="timelineWind" class="text-[10px] text-slate-500">
+            65 km/h
+        </span>
+    </div>
 
     <input
         id="timeSlider"
@@ -330,352 +430,251 @@ body{
         min="0"
         max="8"
         value="0"
-        class="w-full">
+        step="1"
+        class="w-full timeline-range"
+    >
 
-    <div class="flex justify-between text-[10px] text-slate-400">
-        <span id="sliderStart">T-48h</span>
-        <span id="timeDisplay">T-48h</span>
-        <span id="sliderEnd">T-0h</span>
+    <div class="flex justify-between mt-3 gap-1">
+        <button id="prevBtn" class="icon-btn flex-1 h-8">
+            <i data-lucide="skip-back" class="w-4 h-4"></i>
+        </button>
+
+        <button id="playBtn" class="icon-btn flex-1 h-8">
+            <i data-lucide="play" class="w-4 h-4"></i>
+        </button>
+
+        <button id="nextBtn" class="icon-btn flex-1 h-8">
+            <i data-lucide="skip-forward" class="w-4 h-4"></i>
+        </button>
     </div>
 
-    <div class="grid grid-cols-3 gap-1 mt-3">
-
-        <button
-            id="prevBtn"
-            class="bg-slate-800 rounded p-2 text-xs">
-            ◀
+    <div class="mt-3 grid grid-cols-3 gap-1">
+        <button class="speed-btn icon-btn h-7 text-[9px]" data-speed="1500">
+            1×
         </button>
-
-        <button
-            id="playBtn"
-            class="bg-sky-600 rounded p-2 text-xs">
-            ▶
+        <button class="speed-btn icon-btn h-7 text-[9px]" data-speed="800">
+            2×
         </button>
-
-        <button
-            id="nextBtn"
-            class="bg-slate-800 rounded p-2 text-xs">
-            ▶
+        <button class="speed-btn icon-btn h-7 text-[9px]" data-speed="350">
+            4×
         </button>
-
     </div>
 
-    <div class="flex gap-1 mt-2">
+    <div class="border-t border-slate-700/50 my-4"></div>
 
-        <button
-            class="speed bg-sky-500/20 text-sky-300 rounded px-2 py-1 text-[10px]"
-            data-speed="1500">
-            1x
-        </button>
-
-        <button
-            class="speed rounded px-2 py-1 text-[10px]"
-            data-speed="750">
-            2x
-        </button>
-
-        <button
-            class="speed rounded px-2 py-1 text-[10px]"
-            data-speed="300">
-            5x
-        </button>
-
-    </div>
-
-    <hr class="border-slate-700 my-4">
-
-    <h3 class="font-semibold text-sm mb-2">
+    <div class="panel-title mb-3">
         Basemap
-    </h3>
+    </div>
 
-    <div class="grid grid-cols-2 gap-1">
-
-        <button
-            class="base bg-slate-800 rounded p-2 text-[10px]"
-            data-base="satellite">
+    <div class="grid grid-cols-2 gap-2">
+        <button class="base-btn icon-btn h-8 text-[10px]" data-base="satellite">
             Satellite
         </button>
-
-        <button
-            class="base bg-slate-800 rounded p-2 text-[10px]"
-            data-base="dark">
+        <button class="base-btn icon-btn h-8 text-[10px]" data-base="dark">
             Dark Ocean
         </button>
-
-        <button
-            class="base bg-slate-800 rounded p-2 text-[10px]"
-            data-base="ocean">
+        <button class="base-btn icon-btn h-8 text-[10px]" data-base="ocean">
             Ocean
         </button>
-
-        <button
-            class="base bg-slate-800 rounded p-2 text-[10px]"
-            data-base="clear">
+        <button class="base-btn icon-btn h-8 text-[10px]" data-base="clear">
             Clear Coast
         </button>
+    </div>
+
+    <div class="border-t border-slate-700/50 my-4"></div>
+
+    <div class="panel-title mb-3">
+        Trajectory Overlays
+    </div>
+
+    <div class="space-y-2">
+
+        <label class="flex items-center gap-2 text-xs">
+            <input id="portsToggle" type="checkbox" checked>
+            Ports
+        </label>
+
+        <label class="flex items-center gap-2 text-xs">
+            <input id="sheltersToggle" type="checkbox" checked>
+            Relief Shelters
+        </label>
+
+        <label class="flex items-center gap-2 text-xs">
+            <input id="radarsToggle" type="checkbox" checked>
+            Weather Radars
+        </label>
+
+        <label class="flex items-center gap-2 text-xs">
+            <input id="radiusToggle" type="checkbox" checked>
+            Wind Radius
+        </label>
+
+        <label class="flex items-center gap-2 text-xs">
+            <input id="routeToggle" type="checkbox" checked>
+            Disaster-Aware Route
+        </label>
 
     </div>
 
-    <hr class="border-slate-700 my-4">
+    <div class="border-t border-slate-700/50 my-4"></div>
 
-    <h3 class="font-semibold text-sm mb-2">
-        Trajectory Overlays
-    </h3>
+    <div class="panel-title mb-3">
+        Route Legend
+    </div>
 
-    <label>
-        <input type="checkbox" id="layer-ports" checked>
-        ⚓ Ports
-    </label><br>
+    <div class="space-y-2 text-[10px] text-slate-400">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+            Route Start
+        </div>
 
-    <label>
-        <input type="checkbox" id="layer-shelters" checked>
-        🛟 Trajectory Shelters
-    </label><br>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            Route Destination
+        </div>
 
-    <label>
-        <input type="checkbox" id="layer-radars" checked>
-        📡 Doppler Radars
-    </label><br>
-
-    <label>
-        <input type="checkbox" id="layer-windcone" checked>
-        🔴 Wind Radius
-    </label>
+        <div class="flex items-center gap-2">
+            <span class="w-8 h-[3px] bg-sky-400"></span>
+            Current Safe Route
+        </div>
+    </div>
 
 </aside>
 
 
-<!-- RIGHT TELEMETRY -->
+<!-- RIGHT SIDEBAR -->
+<aside class="desktop-sidebar absolute right-3 top-[70px] bottom-3 z-[4000] w-[315px] overflow-y-auto glass rounded-xl p-3">
 
-<aside class="absolute top-4 right-4 w-96 glass panel rounded-xl p-4 z-[500] max-h-[calc(100vh-110px)] overflow-y-auto">
+    <!-- STORM TELEMETRY -->
+    <div class="flex items-center justify-between mb-3">
+        <div class="panel-title">
+            Storm Telemetry
+        </div>
 
-    <div class="flex justify-between items-center">
+        <span id="category" class="badge badge-red">
+            DD
+        </span>
+    </div>
 
-        <div>
+    <div class="grid grid-cols-2 gap-2">
 
-            <div class="text-[10px] text-slate-400">
-                ACTIVE CYCLONE
-            </div>
-
-            <div id="stormName" class="font-bold text-lg">
+        <div class="stat-card">
+            <div class="small-label">Cyclone</div>
+            <div id="stormName" class="small-value mt-1">
                 CYCLONE DANA
             </div>
-
         </div>
 
-        <span
-            id="category"
-            class="text-[10px] bg-red-500/20 text-red-300 border border-red-400/30 rounded px-2 py-1">
-            VSCS
-        </span>
+        <div class="stat-card">
+            <div class="small-label">Basin</div>
+            <div id="basin" class="small-value mt-1">
+                Bay of Bengal
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Wind</div>
+            <div id="wind" class="small-value mt-1">
+                65 km/h
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Pressure</div>
+            <div id="pressure" class="small-value mt-1">
+                994 hPa
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Movement</div>
+            <div id="heading" class="small-value mt-1">
+                —
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Position</div>
+            <div id="coords" class="small-value mt-1">
+                —
+            </div>
+        </div>
 
     </div>
 
-    <div class="grid grid-cols-2 gap-2 mt-4">
+    <div class="grid grid-cols-2 gap-2 mt-2">
 
-        <div class="bg-slate-900/70 rounded p-2">
-            <div class="small text-slate-400">WIND</div>
-            <b id="wind">65</b> km/h
+        <div>
+            <div class="small-label">Timeline</div>
+            <div id="timestamp" class="text-xs font-bold text-sky-400 mt-1">
+                T-48h
+            </div>
         </div>
 
-        <div class="bg-slate-900/70 rounded p-2">
-            <div class="small text-slate-400">PRESSURE</div>
-            <b id="pressure">994</b> hPa
-        </div>
-
-        <div class="bg-slate-900/70 rounded p-2">
-            <div class="small text-slate-400">MOVEMENT</div>
-            <b id="heading">NE</b>
-        </div>
-
-        <div class="bg-slate-900/70 rounded p-2">
-            <div class="small text-slate-400">POSITION</div>
-            <b id="coords">14.20°N, 89.60°E</b>
-        </div>
-
-    </div>
-
-    <div class="mt-3 text-xs">
-
-        <div class="text-slate-400">
-            TIMESTAMP
-        </div>
-
-        <div id="timestamp">
-            T-48h
-        </div>
-
-        <div class="text-slate-400 mt-2">
-            LANDFALL
-        </div>
-
-        <div id="landfall" class="text-amber-300">
-            IN ~48 HOURS
+        <div>
+            <div class="small-label">Landfall</div>
+            <div id="landfall" class="text-xs font-bold text-orange-400 mt-1">
+                48h
+            </div>
         </div>
 
     </div>
 
     <div class="mt-3">
-
-        <div class="flex justify-between text-[10px] text-slate-400">
-
-            <span>
-                Wind intensity
-            </span>
-
-            <span id="peak"></span>
-
+        <div class="small-label mb-1">
+            Wind Intensity
         </div>
 
-        <canvas
-            id="spark"
-            height="80"
-            class="w-full">
-        </canvas>
-
+        <canvas id="spark" height="55" class="w-full"></canvas>
     </div>
 
-    <div class="mt-3 p-3 rounded bg-sky-950/60 border border-sky-500/20">
 
-        <div class="text-[10px] text-sky-300 font-bold">
-            🤖 AI DISASTER ADVISORY
+    <!-- AI ADVISORY -->
+    <div class="border-t border-slate-700/50 my-4"></div>
+
+    <div class="flex items-center justify-between mb-2">
+        <div class="panel-title">
+            AI Advisory
         </div>
 
-        <div
-        id="ai-advisory"
-        class="text-xs text-slate-300 mt-2 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto"
-        >
-        Loading backend advisory...
-        </div>
-
-        <!-- RF FLOOD PREDICTION -->
-         <!-- DISASTER-AWARE ROUTING -->
-<div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
-
-    <div class="flex items-center justify-between mb-3">
-        <div>
-            <div class="text-xs font-bold text-sky-300">
-                DISASTER-AWARE ROUTING
-            </div>
-            <div class="text-[10px] text-slate-500">
-                Time-dependent route optimization
-            </div>
-        </div>
-
-           
-
-</div>
-<div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
-
-    <div class="flex items-center justify-between mb-3">
-        <div>
-            <div class="text-xs font-bold text-sky-300">
-                RF FLOOD PREDICTION
-                <!-- DISASTER-AWARE ROUTING -->
-<div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
-
-    <div class="flex items-center justify-between mb-3">
-        <div>
-            <div class="text-xs font-bold text-sky-300">
-                DISASTER-AWARE ROUTING
-            </div>
-            <div class="text-[10px] text-slate-500">
-                Time-dependent route optimization
-            </div>
-        </div>
-
-        <div
-            id="routing-status"
-            class="text-[10px] px-2 py-1 rounded bg-slate-700 text-slate-300"
-        >
-            WAITING
-        </div>
-    </div>
-
-    <div class="grid grid-cols-3 gap-2">
-
-        <div class="bg-slate-950/60 rounded-lg p-3">
-            <div class="text-[9px] text-slate-500">
-                ROUTE SCENARIO
-            </div>
-            <div
-                id="route-stage"
-                class="text-sm font-bold text-sky-300 mt-1"
-            >
-                —
-            </div>
-        </div>
-
-        <div class="bg-slate-950/60 rounded-lg p-3">
-            <div class="text-[9px] text-slate-500">
-                ROUTING COST
-            </div>
-            <div
-                id="route-cost"
-                class="text-sm font-bold text-yellow-300 mt-1"
-            >
-                —
-            </div>
-        </div>
-
-        <div class="bg-slate-950/60 rounded-lg p-3">
-            <div class="text-[9px] text-slate-500">
-                ROUTE CHANGE
-            </div>
-            <div
-                id="route-change"
-                class="text-sm font-bold text-orange-300 mt-1"
-            >
-                —
-            </div>
-        </div>
-
+        <span id="advisoryStatus" class="badge badge-yellow">
+            LOADING
+        </span>
     </div>
 
     <div
-        id="routing-note"
-        class="text-[10px] text-slate-500 mt-3"
+        id="ai-advisory"
+        class="rounded-lg bg-slate-950/60 border border-slate-800 p-3 text-[11px] leading-5 text-slate-300 min-h-[100px]"
     >
-        Waiting for routing data.
+        Loading advisory...
     </div>
 
-</div>
-            </div>
-            <div class="text-[10px] text-slate-500">
-                Geospatial risk model
-            </div>
+
+    <!-- FLOOD PREDICTION -->
+    <div class="border-t border-slate-700/50 my-4"></div>
+
+    <div class="flex items-center justify-between mb-2">
+        <div class="panel-title">
+            RF Flood Prediction
         </div>
 
-        <div
-            id="flood-model-status"
-            class="text-[10px] px-2 py-1 rounded bg-slate-700 text-slate-300"
-        >
+        <span id="flood-model-status" class="badge badge-yellow">
             READY
-        </div>
+        </span>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-2 gap-2">
 
-        <div class="bg-slate-950/60 rounded-lg p-3">
-            <div class="text-[10px] text-slate-500">
-                FLOOD PROBABILITY
-            </div>
-            <div
-                id="flood-probability"
-                class="text-xl font-bold text-sky-300 mt-1"
-            >
+        <div class="stat-card">
+            <div class="small-label">Probability</div>
+            <div id="flood-probability" class="text-lg font-black text-cyan-400 mt-1">
                 —
             </div>
         </div>
 
-        <div class="bg-slate-950/60 rounded-lg p-3">
-            <div class="text-[10px] text-slate-500">
-                RISK CLASS
-            </div>
-            <div
-                id="flood-risk-class"
-                class="text-xl font-bold text-emerald-300 mt-1"
-            >
+        <div class="stat-card">
+            <div class="small-label">Risk Class</div>
+            <div id="flood-risk-class" class="text-lg font-black text-orange-400 mt-1">
                 —
             </div>
         </div>
@@ -684,676 +683,424 @@ body{
 
     <div
         id="flood-model-note"
-        class="text-[10px] text-slate-500 mt-3"
+        class="text-[10px] text-slate-500 mt-2 leading-4"
     >
-        Waiting for geospatial prediction input.
+        Enter environmental values to query the Random Forest model.
     </div>
 
-</div>
+    <button
+        id="runPredictionBtn"
+        class="w-full mt-3 h-9 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition"
+    >
+        Run Flood Prediction
+    </button>
 
+
+    <!-- ROUTING -->
+    <div class="border-t border-slate-700/50 my-4"></div>
+
+    <div class="flex items-center justify-between mb-2">
+        <div class="panel-title">
+            Disaster-Aware Routing
+        </div>
+
+        <span id="routing-status" class="badge badge-yellow">
+            LOADING
+        </span>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2">
+
+        <div class="stat-card">
+            <div class="small-label">Stage</div>
+            <div id="route-stage" class="text-sm font-black text-sky-400 mt-1">
+                —
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Cost</div>
+            <div id="route-cost" class="text-sm font-black text-white mt-1">
+                —
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Change</div>
+            <div id="route-change" class="text-sm font-black text-orange-400 mt-1">
+                —
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mt-2">
+
+        <div class="stat-card">
+            <div class="small-label">Nodes</div>
+            <div id="route-nodes" class="small-value mt-1">
+                —
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="small-label">Landfall</div>
+            <div id="route-landfall" class="small-value mt-1">
+                —
+            </div>
+        </div>
+
+    </div>
+
+    <div
+        id="routing-note"
+        class="text-[10px] text-slate-500 mt-2 leading-4"
+    >
+        Waiting for routing data...
     </div>
 
 </aside>
 
 
-<!-- BOTTOM STATUS -->
+<!-- MOBILE INFO -->
+<div
+    id="mobileInfo"
+    class="hidden absolute bottom-3 left-3 right-3 z-[4000] glass rounded-xl p-3"
+>
+    <div class="flex justify-between items-center">
+        <div>
+            <div id="mobileStorm" class="font-bold text-sm">
+                CYCLONE DANA
+            </div>
+            <div id="mobileTimeline" class="text-[10px] text-slate-400">
+                T-48h
+            </div>
+        </div>
 
-<aside class="absolute top-4 right-4 w-72 glass panel rounded-xl p-4 z-[500] max-h-[calc(100vh-110px)] overflow-y-auto"></aside>
-
-    <div class="flex justify-between">
-
-        <span
-            id="feedStatus"
-            class="text-[10px] text-emerald-400">
-            HISTORICAL TIMELINE MODE
-        </span>
-
-        <button
-            id="logToggle"
-            class="text-[10px] text-sky-300">
-            Telemetry Log
-        </button>
-
+        <div class="text-right">
+            <div id="mobileWind" class="font-bold text-sky-400">
+                65 km/h
+            </div>
+            <div id="mobileRoute" class="text-[10px] text-orange-400">
+                Route: 48h
+            </div>
+        </div>
     </div>
-
-    <div
-        id="log"
-        class="hidden max-h-28 overflow-y-auto mt-2 text-[10px] space-y-1">
-    </div>
-
-</div>
-
 </div>
 
 
 <!-- JSON MODAL -->
+<div id="jsonModal" class="modal">
 
-<div
-    id="jsonModal"
-    class="hidden fixed inset-0 bg-black/70 z-[2000] items-center justify-center">
+    <div class="modal-box">
 
-    <div class="glass rounded-xl p-5 w-[90%] max-w-2xl">
+        <div class="p-4 border-b border-slate-700 flex justify-between items-center">
 
-        <div class="flex justify-between mb-3">
-
-            <h2 class="font-bold">
-                Custom Track JSON
-            </h2>
-
-            <button id="closeJson">
-                ✕
-            </button>
-
-        </div>
-
-        <textarea
-            id="jsonInput"
-            class="w-full h-80 bg-slate-950 text-slate-200 rounded p-3 text-xs font-mono">
-        </textarea>
-
-        <div class="flex justify-end gap-2 mt-3">
-
-            <button
-                id="resetJson"
-                class="bg-slate-700 px-3 py-2 rounded text-xs">
-                Reset
-            </button>
-
-            <button
-                id="applyJson"
-                class="bg-sky-600 px-3 py-2 rounded text-xs">
-                Apply
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ========================================================= -->
-<!-- HUMAN FEEDBACK DASHBOARD -->
-<!-- ========================================================= -->
-
-<div
-    id="feedbackModal"
-    class="feedback-modal">
-
-    <div class="feedback-dashboard">
-
-        <!-- HEADER -->
-
-        <div class="p-5 border-b border-slate-700/70">
-
-            <div class="flex items-center justify-between">
-
-                <div>
-
-                    <div class="flex items-center gap-2">
-
-                        <div class="text-xl">
-                            👤
-                        </div>
-
-                        <div>
-
-                            <h2 class="font-bold text-lg">
-                                Human Feedback Dashboard
-                            </h2>
-
-                            <p class="text-[11px] text-slate-400">
-                                Community observations help improve disaster awareness
-                            </p>
-
-                        </div>
-
-                    </div>
-
+            <div>
+                <div class="font-bold">
+                    Load Cyclone Dataset
                 </div>
 
+                <div class="text-[10px] text-slate-500 mt-1">
+                    JSON must contain name, basin and track.
+                </div>
+            </div>
+
+            <button id="closeJson" class="icon-btn w-8 h-8">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+        </div>
+
+        <div class="p-4">
+
+            <textarea
+                id="jsonInput"
+                class="w-full h-[330px] bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-300 outline-none focus:border-sky-500"
+                spellcheck="false"
+            ></textarea>
+
+            <div class="flex gap-2 mt-3">
+
                 <button
-                    id="closeFeedback"
-                    class="text-slate-400 hover:text-white text-xl">
-                    ✕
+                    id="resetJson"
+                    class="flex-1 h-9 rounded-lg border border-slate-700 text-xs"
+                >
+                    Reset Sample
+                </button>
+
+                <button
+                    id="applyJson"
+                    class="flex-1 h-9 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-bold"
+                >
+                    Apply Dataset
                 </button>
 
             </div>
 
-        </div>
-
-
-        <!-- DASHBOARD STATISTICS -->
-
-        <div class="p-5">
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-
-                <div class="feedback-stat">
-
-                    <div class="text-[10px] text-slate-400">
-                        TOTAL REPORTS
-                    </div>
-
-                    <div
-                        id="totalFeedback"
-                        class="text-2xl font-bold text-sky-400 mt-1">
-                        0
-                    </div>
-
-                </div>
-
-                <div class="feedback-stat">
-
-                    <div class="text-[10px] text-slate-400">
-                        AVG SAFETY
-                    </div>
-
-                    <div
-                        id="averageSafety"
-                        class="text-2xl font-bold text-emerald-400 mt-1">
-                        —
-                    </div>
-
-                </div>
-
-                <div class="feedback-stat">
-
-                    <div class="text-[10px] text-slate-400">
-                        HIGH IMPACT
-                    </div>
-
-                    <div
-                        id="highImpact"
-                        class="text-2xl font-bold text-red-400 mt-1">
-                        0
-                    </div>
-
-                </div>
-
-                <div class="feedback-stat">
-
-                    <div class="text-[10px] text-slate-400">
-                        CURRENT FIX
-                    </div>
-
-                    <div
-                        id="feedbackLocation"
-                        class="text-sm font-bold text-sky-300 mt-2">
-                        T-48h
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- FEEDBACK FORM -->
-
-            <div class="feedback-card p-5 mt-5">
-
-                <div class="flex items-center justify-between mb-4">
-
-                    <div>
-
-                        <h3 class="font-bold">
-                            Submit Human Observation
-                        </h3>
-
-                        <p class="text-[10px] text-slate-400 mt-1">
-                            Your observation can complement automated cyclone predictions.
-                        </p>
-
-                    </div>
-
-                    <span class="text-xl">
-                        📝
-                    </span>
-
-                </div>
-
-
-                <!-- SAFETY RATING -->
-
-                <div class="mb-5">
-
-                    <label class="text-xs font-semibold">
-                        How safe does the current area feel?
-                    </label>
-
-                    <div
-                        id="starRating"
-                        class="flex gap-1 mt-2">
-
-                        <span class="star" data-rating="1">★</span>
-                        <span class="star" data-rating="2">★</span>
-                        <span class="star" data-rating="3">★</span>
-                        <span class="star" data-rating="4">★</span>
-                        <span class="star" data-rating="5">★</span>
-
-                    </div>
-
-                    <div
-                        id="ratingText"
-                        class="text-[10px] text-slate-400 mt-1">
-                        Select a safety rating
-                    </div>
-
-                </div>
-
-
-                <!-- IMPACT CATEGORY -->
-
-                <div class="mb-5">
-
-                    <label class="text-xs font-semibold">
-                        What are you observing?
-                    </label>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactFlood"
-                                value="Flooding">
-
-                            <label for="impactFlood">
-                                🌊 Flooding
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactRoad"
-                                value="Road Damage">
-
-                            <label for="impactRoad">
-                                🛣️ Road Damage
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactPower"
-                                value="Power Outage">
-
-                            <label for="impactPower">
-                                ⚡ Power Outage
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactWind"
-                                value="Strong Winds">
-
-                            <label for="impactWind">
-                                💨 Strong Winds
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactRain"
-                                value="Heavy Rain">
-
-                            <label for="impactRain">
-                                🌧️ Heavy Rain
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactShelter"
-                                value="Shelter Issue">
-
-                            <label for="impactShelter">
-                                🛟 Shelter Issue
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactHospital"
-                                value="Healthcare Access">
-
-                            <label for="impactHospital">
-                                🏥 Healthcare
-                            </label>
-
-                        </div>
-
-                        <div class="feedback-category">
-
-                            <input
-                                type="radio"
-                                name="impact"
-                                id="impactOther"
-                                value="Other">
-
-                            <label for="impactOther">
-                                📍 Other
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- SEVERITY -->
-
-<div class="mb-5">
-
-    <label class="text-xs font-semibold">
-        How severe is the situation?
-    </label>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-
-        <div class="feedback-category">
-
-            <input
-                type="radio"
-                name="severity"
-                id="severityLow"
-                value="Low">
-
-            <label for="severityLow">
-                🟢 Low
-            </label>
+            <div id="jsonMessage" class="text-[10px] mt-3 text-slate-500"></div>
 
         </div>
-
-        <div class="feedback-category">
-
-            <input
-                type="radio"
-                name="severity"
-                id="severityModerate"
-                value="Moderate">
-
-            <label for="severityModerate">
-                🟡 Moderate
-            </label>
-
-        </div>
-
-        <div class="feedback-category">
-
-            <input
-                type="radio"
-                name="severity"
-                id="severityHigh"
-                value="High">
-
-            <label for="severityHigh">
-                🟠 High
-            </label>
-
-        </div>
-
-        <div class="feedback-category">
-
-            <input
-                type="radio"
-                name="severity"
-                id="severityCritical"
-                value="Critical">
-
-            <label for="severityCritical">
-                🔴 Critical
-            </label>
-
-        </div>
-
     </div>
-
 </div>
 
-                <!-- OBSERVATION -->
 
-                <div class="mb-4">
+<!-- FEEDBACK MODAL -->
+<div id="feedbackModal" class="modal">
 
-                    <label
-                        for="feedbackComment"
-                        class="text-xs font-semibold">
-                        Observation / Comment
-                    </label>
+    <div class="modal-box max-w-2xl">
 
-                    <textarea
-                        id="feedbackComment"
-                        maxlength="500"
-                        placeholder="Describe what you are seeing or experiencing..."
-                        class="w-full mt-2 h-24 bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-slate-200 outline-none focus:border-sky-500 resize-none">
-                    </textarea>
+        <div class="p-4 border-b border-slate-700 flex justify-between items-center">
 
-                    <div class="flex justify-between mt-1">
-
-                        <span class="text-[10px] text-slate-500">
-                            Do not include personal or sensitive information.
-                        </span>
-
-                        <span
-                            id="charCount"
-                            class="text-[10px] text-slate-500">
-                            0/500
-                        </span>
-
-                    </div>
-
+            <div>
+                <div class="font-bold">
+                    Human Feedback Dashboard
                 </div>
 
-
-                <!-- LOCATION INFO -->
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-
-                    <div>
-
-                        <label class="text-[10px] text-slate-400">
-                            CURRENT CYCLONE TIME
-                        </label>
-
-                        <div
-                            id="feedbackTime"
-                            class="bg-slate-950 border border-slate-700 rounded-lg p-2 mt-1 text-xs">
-                            T-48h
-                        </div>
-
-                    </div>
-
-                    <div>
-
-                        <label class="text-[10px] text-slate-400">
-                            CYCLONE POSITION
-                        </label>
-
-                        <div
-                            id="feedbackCoords"
-                            class="bg-slate-950 border border-slate-700 rounded-lg p-2 mt-1 text-xs">
-                            14.20°N, 89.60°E
-                        </div>
-
-                    </div>
-
+                <div class="text-[10px] text-slate-500 mt-1">
+                    Local feedback signals for disaster-awareness evaluation.
                 </div>
-
-
-                <div class="flex justify-end">
-
-                    <button
-                        id="submitFeedback"
-                        class="bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-lg text-xs font-bold">
-                        Submit Observation
-                    </button>
-
-                </div>
-
-                <div
-                    id="feedbackMessage"
-                    class="hidden mt-3 p-3 rounded-lg text-xs">
-                </div>
-
             </div>
 
-
-            <!-- FEEDBACK ANALYTICS -->
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-
-                <div class="feedback-card p-4">
-
-                    <h3 class="font-bold text-sm mb-3">
-                        📊 Impact Reports
-                    </h3>
-
-                    <div
-                        id="impactStats"
-                        class="space-y-2">
-                    </div>
-
-                </div>
-
-
-                <div class="feedback-card p-4">
-
-                    <h3 class="font-bold text-sm mb-3">
-                        🧭 Human vs AI Signal
-                    </h3>
-
-                    <div class="text-[11px] text-slate-400 leading-relaxed">
-
-                        Human observations can provide additional ground-level
-                        context that automated models may not immediately capture.
-
-                    </div>
-
-                    <div class="mt-4 space-y-3">
-
-                        <div>
-
-                            <div class="flex justify-between text-[10px]">
-                                <span>
-                                    Automated Forecast
-                                </span>
-
-                                <span class="text-sky-300">
-                                    AI
-                                </span>
-                            </div>
-
-                            <div class="h-2 bg-slate-800 rounded-full mt-1">
-
-                                <div
-                                    class="h-2 bg-sky-500 rounded-full"
-                                    style="width:78%">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div>
-
-                            <div class="flex justify-between text-[10px]">
-                                <span>
-                                    Human Observations
-                                </span>
-
-                                <span class="text-emerald-300">
-                                    Community
-                                </span>
-                            </div>
-
-                            <div class="h-2 bg-slate-800 rounded-full mt-1">
-
-                                <div
-                                    id="humanSignalBar"
-                                    class="h-2 bg-emerald-500 rounded-full"
-                                    style="width:5%">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- RECENT FEEDBACK -->
-
-            <div class="feedback-card p-4 mt-5">
-
-                <div class="flex items-center justify-between mb-3">
-
-                    <h3 class="font-bold text-sm">
-                        🗣️ Recent Human Observations
-                    </h3>
-
-                    <button
-                        id="clearFeedback"
-                        class="text-[10px] text-red-400 hover:text-red-300">
-                        Clear Local Data
-                    </button>
-
-                </div>
-
-                <div id="recentFeedback">
-
-                    <div class="text-xs text-slate-500">
-                        No observations submitted yet.
-                    </div>
-
-                </div>
-
-            </div>
+            <button id="closeFeedback" class="icon-btn w-8 h-8">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
 
         </div>
 
-    </div>
+        <div class="p-4">
 
+            <div class="grid grid-cols-3 gap-2 mb-4">
+
+                <div class="stat-card">
+                    <div class="small-label">Reports</div>
+                    <div id="feedbackTotal" class="text-lg font-black text-white mt-1">
+                        0
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="small-label">Average Rating</div>
+                    <div id="feedbackAverage" class="text-lg font-black text-yellow-400 mt-1">
+                        —
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="small-label">High Severity</div>
+                    <div id="feedbackHigh" class="text-lg font-black text-red-400 mt-1">
+                        0
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mb-4">
+
+                <div class="panel-title mb-2">
+                    Safety Rating
+                </div>
+
+                <div id="ratingStars" class="flex gap-1">
+                    <span class="feedback-star" data-rating="1">★</span>
+                    <span class="feedback-star" data-rating="2">★</span>
+                    <span class="feedback-star" data-rating="3">★</span>
+                    <span class="feedback-star" data-rating="4">★</span>
+                    <span class="feedback-star" data-rating="5">★</span>
+                </div>
+
+            </div>
+
+            <div class="mb-4">
+
+                <div class="panel-title mb-2">
+                    Report Type
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="reportType" value="Road">
+                        Road
+                    </label>
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="reportType" value="Flood">
+                        Flood
+                    </label>
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="reportType" value="Infrastructure">
+                        Infrastructure
+                    </label>
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="reportType" value="Other">
+                        Other
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="mb-4">
+
+                <div class="panel-title mb-2">
+                    Severity
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="severity" value="Low">
+                        Low
+                    </label>
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="severity" value="Medium">
+                        Medium
+                    </label>
+
+                    <label class="radio-option text-xs">
+                        <input type="radio" name="severity" value="High">
+                        High
+                    </label>
+
+                </div>
+
+            </div>
+
+            <textarea
+                id="feedbackComment"
+                maxlength="500"
+                placeholder="Describe what you observed..."
+                class="w-full h-24 bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs outline-none focus:border-sky-500"
+            ></textarea>
+
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                <span id="feedbackTime">—</span>
+                <span id="charCount">0/500</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-3">
+
+                <div class="stat-card">
+                    <div class="small-label">Cyclone Position</div>
+                    <div id="feedbackCoords" class="text-[10px] text-slate-300 mt-1">
+                        —
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="small-label">Human Signal</div>
+                    <div id="humanSignalBar" class="text-[10px] text-slate-300 mt-1">
+                        Waiting
+                    </div>
+                </div>
+
+            </div>
+
+            <button
+                id="submitFeedback"
+                class="w-full mt-4 h-10 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-bold"
+            >
+                Submit Feedback
+            </button>
+
+            <div
+                id="feedbackMessage"
+                class="text-[10px] text-center mt-2 text-slate-500"
+            ></div>
+
+            <div class="border-t border-slate-700/50 my-4"></div>
+
+            <div class="flex justify-between items-center mb-2">
+                <div class="panel-title">
+                    Recent Feedback
+                </div>
+
+                <button
+                    id="clearFeedback"
+                    class="text-[10px] text-red-400 hover:text-red-300"
+                >
+                    Clear Local Data
+                </button>
+            </div>
+
+            <div
+                id="recentFeedback"
+                class="space-y-2 max-h-40 overflow-y-auto"
+            >
+                No feedback yet.
+            </div>
+
+        </div>
+    </div>
 </div>
 
 
 <script>
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+"use strict";
 
-function $(id){
-    return document.getElementById(id);
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
+const API_BASE_URL = "https://charybdis-mind.onrender.com";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+function setText(id, value){
+    const el = $(id);
+    if(el){
+        el.textContent = value;
+    }
 }
+
+function escapeHTML(value){
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+function setBadge(text, cls){
+    const el = $("backendBadge");
+
+    if(!el) return;
+
+    el.textContent = "BACKEND: " + text;
+    el.className = "badge " + cls;
+}
+
+async function getJSON(path){
+
+    const response = await fetch(API_BASE_URL + path, {
+        method:"GET",
+        headers:{
+            "Accept":"application/json"
+        }
+    });
+
+    if(!response.ok){
+        throw new Error(`${path} returned ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+
+/* =========================================================
+   DEFAULT CYCLONE DATA
+========================================================= */
 
 const DEFAULT_DATASET = {
 
@@ -1362,7 +1109,6 @@ const DEFAULT_DATASET = {
     basin:"Bay of Bengal",
 
     track:[
-
         {
             timestamp:"T-48h",
             lat:14.2,
@@ -1371,7 +1117,6 @@ const DEFAULT_DATASET = {
             pressure:994,
             landfallIn:48
         },
-
         {
             timestamp:"T-42h",
             lat:15.0,
@@ -1380,7 +1125,6 @@ const DEFAULT_DATASET = {
             pressure:988,
             landfallIn:42
         },
-
         {
             timestamp:"T-36h",
             lat:15.8,
@@ -1389,7 +1133,6 @@ const DEFAULT_DATASET = {
             pressure:982,
             landfallIn:36
         },
-
         {
             timestamp:"T-30h",
             lat:16.7,
@@ -1398,7 +1141,6 @@ const DEFAULT_DATASET = {
             pressure:976,
             landfallIn:30
         },
-
         {
             timestamp:"T-24h",
             lat:17.6,
@@ -1407,7 +1149,6 @@ const DEFAULT_DATASET = {
             pressure:970,
             landfallIn:24
         },
-
         {
             timestamp:"T-18h",
             lat:18.5,
@@ -1416,7 +1157,6 @@ const DEFAULT_DATASET = {
             pressure:964,
             landfallIn:18
         },
-
         {
             timestamp:"T-12h",
             lat:19.5,
@@ -1425,7 +1165,6 @@ const DEFAULT_DATASET = {
             pressure:958,
             landfallIn:12
         },
-
         {
             timestamp:"T-6h",
             lat:20.3,
@@ -1434,7 +1173,6 @@ const DEFAULT_DATASET = {
             pressure:962,
             landfallIn:6
         },
-
         {
             timestamp:"T-0h",
             lat:21.0,
@@ -1443,7 +1181,6 @@ const DEFAULT_DATASET = {
             pressure:974,
             landfallIn:0
         }
-
     ],
 
     infrastructure:{
@@ -1496,2044 +1233,2224 @@ const DEFAULT_DATASET = {
                 lon:88.36
             }
         ]
-
     }
-
 };
 
-let data = structuredClone(DEFAULT_DATASET);
 
-let playback = null;
-let speed = 1500;
-let liveTimer = null;
+let data = JSON.parse(JSON.stringify(DEFAULT_DATASET));
 
 
-/* MAP + BASEMAPS */
+/* =========================================================
+   ROUTING DATA
+========================================================= */
 
-const satellite = L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    {
-        maxZoom:19
-    }
-);
-
-const dark = L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    {
-        subdomains:"abcd",
-        maxZoom:20
-    }
-);
-
-const ocean = L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
-    {
-        maxZoom:13
-    }
-);
-
-const clear = L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    {
-        subdomains:"abcd",
-        maxZoom:20
-    }
-);
-
-const map = L.map(
-    "map",
-    {
-        center:[20.3,85.8],
-        zoom:7,
-        layers:[satellite],
-        zoomControl:false
-    }
-);
-
-L.control.zoom({
-    position:"bottomright"
-}).addTo(map);
+let routingData = null;
+let activeRouteLayer = null;
+let activeRouteStart = null;
+let activeRouteEnd = null;
+let activeRouteStage = null;
 
 
-function switchBase(key){
+/* =========================================================
+   MAP
+========================================================= */
 
-    [satellite,dark,ocean,clear].forEach(x=>{
+const map = L.map("map", {
+    zoomControl:true,
+    preferCanvas:true
+}).setView([20.5,86.5],6);
 
-        if(map.hasLayer(x)){
-            map.removeLayer(x);
+
+/* =========================================================
+   BASEMAPS
+========================================================= */
+
+const baseLayers = {
+
+    satellite:L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+            attribution:"Tiles © Esri",
+            maxZoom:19
         }
+    ),
 
-    });
+    dark:L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        {
+            attribution:"© OpenStreetMap © CARTO",
+            maxZoom:19
+        }
+    ),
 
-    ({
-        satellite,
-        dark,
-        ocean,
-        clear
-    }[key] || satellite).addTo(map);
+    ocean:L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
+        {
+            attribution:"Tiles © Esri",
+            maxZoom:13
+        }
+    ),
 
-}
+    clear:L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+            attribution:"© OpenStreetMap © CARTO",
+            maxZoom:19
+        }
+    )
+};
+
+baseLayers.dark.addTo(map);
 
 
-document.querySelectorAll(".base").forEach(
-    b => b.onclick = () => switchBase(b.dataset.base)
-);
-
-
-/* USER MAP-LAYER DATA */
+/* =========================================================
+   LAYER GROUPS
+========================================================= */
 
 const layers = {
 
-    roads:L.layerGroup(),
-    hospitals:L.layerGroup(),
-    shelters:L.layerGroup(),
-    power:L.layerGroup(),
-    water:L.layerGroup(),
-    coast:L.layerGroup(),
-    population:L.layerGroup(),
-    cyclone:L.layerGroup()
+    roads:L.layerGroup().addTo(map),
 
+    hospitals:L.layerGroup().addTo(map),
+
+    shelters:L.layerGroup().addTo(map),
+
+    power:L.layerGroup(),
+
+    water:L.layerGroup(),
+
+    coast:L.layerGroup(),
+
+    population:L.layerGroup(),
+
+    cyclone:L.layerGroup().addTo(map)
 };
 
 
-const roadData = [
+/* =========================================================
+   SAMPLE INFRASTRUCTURE
+========================================================= */
+
+const roads = [
 
     [
-        [20.30,85.82],
-        [20.35,85.90],
-        [20.45,86.05]
+        [22.468318,88.302682],
+        [22.4695,88.301],
+        [22.474,88.296],
+        [22.479,88.289],
+        [22.483666,88.28225]
     ],
 
     [
-        [20.25,85.82],
-        [20.05,85.83],
-        [19.81,85.83]
+        [20.27,86.70],
+        [20.55,86.50],
+        [20.79,86.95]
     ],
 
     [
-        [20.30,85.82],
-        [20.50,86.42],
-        [20.70,86.70]
+        [19.16,84.93],
+        [19.45,85.3],
+        [19.81,85.83],
+        [20.27,86.70]
     ]
+];
 
+roads.forEach(path => {
+
+    L.polyline(path,{
+        color:"#64748b",
+        weight:3,
+        opacity:.7
+    })
+    .bindTooltip("Road Network")
+    .addTo(layers.roads);
+
+});
+
+
+const hospitals = [
+
+    {
+        name:"Kolkata Emergency Hospital",
+        lat:22.5726,
+        lon:88.3639
+    },
+
+    {
+        name:"Diamond Harbour Hospital",
+        lat:22.191,
+        lon:88.242
+    },
+
+    {
+        name:"Puri District Hospital",
+        lat:19.813,
+        lon:85.831
+    }
 ];
 
 
-roadData.forEach(
-    r => L.polyline(
-        r,
+hospitals.forEach(item => {
+
+    L.circleMarker(
+        [item.lat,item.lon],
         {
-            color:"#f59e0b",
-            weight:4
+            radius:6,
+            color:"#f43f5e",
+            fillColor:"#f43f5e",
+            fillOpacity:.9,
+            weight:2
         }
-    ).addTo(layers.roads)
-);
-
-
-function labelledMarker(
-    lat,
-    lon,
-    name,
-    emoji,
-    cls,
-    group
-){
-
-    const ic = L.divIcon({
-
-        className:"map-label-icon",
-
-        html:`
-            <div class="map-pin ${cls}">
-                <span class="pin-icon">${emoji}</span>
-                <span>${name}</span>
-            </div>
-        `,
-
-        iconSize:null,
-        iconAnchor:[12,12]
-
-    });
-
-    L.marker(
-        [lat,lon],
-        {icon:ic}
     )
-    .bindPopup(`<b>${emoji} ${name}</b>`)
-    .addTo(group);
+    .bindPopup(
+        `<b>${escapeHTML(item.name)}</b><br>Hospital`
+    )
+    .addTo(layers.hospitals);
 
-}
+});
 
 
-labelledMarker(
-    20.30,
-    85.82,
-    "AIIMS Bhubaneswar",
-    "🏥",
-    "pin-hospital",
-    layers.hospitals
-);
+const powerPoints = [
 
-labelledMarker(
-    20.47,
-    85.88,
-    "SCB Medical College",
-    "🏥",
-    "pin-hospital",
-    layers.hospitals
-);
+    {
+        name:"Kolkata Power Hub",
+        lat:22.57,
+        lon:88.36
+    },
 
-labelledMarker(
-    19.81,
-    85.83,
-    "Puri Hospital",
-    "🏥",
-    "pin-hospital",
-    layers.hospitals
-);
+    {
+        name:"Haldia Power Station",
+        lat:22.03,
+        lon:88.06
+    },
 
-labelledMarker(
-    20.50,
-    86.42,
-    "Kendrapara Emergency Shelter",
-    "🛟",
-    "pin-shelter",
-    layers.shelters
-);
+    {
+        name:"Paradip Power Station",
+        lat:20.27,
+        lon:86.70
+    }
+];
 
-labelledMarker(
-    21.06,
-    86.50,
-    "Bhadrak Emergency Shelter",
-    "🛟",
-    "pin-shelter",
-    layers.shelters
-);
 
-labelledMarker(
-    19.81,
-    85.83,
-    "Puri Relief Center",
-    "🛟",
-    "pin-shelter",
-    layers.shelters
-);
+powerPoints.forEach(item => {
 
-labelledMarker(
-    20.27,
-    86.70,
-    "Paradip Substation",
-    "⚡",
-    "pin-power",
-    layers.power
-);
+    L.circleMarker(
+        [item.lat,item.lon],
+        {
+            radius:5,
+            color:"#facc15",
+            fillColor:"#facc15",
+            fillOpacity:.85
+        }
+    )
+    .bindPopup(
+        `<b>${escapeHTML(item.name)}</b><br>Power Infrastructure`
+    )
+    .addTo(layers.power);
 
-labelledMarker(
-    20.30,
-    85.82,
-    "Bhubaneswar Power Grid",
-    "⚡",
-    "pin-power",
-    layers.power
-);
+});
 
-labelledMarker(
-    20.50,
-    86.42,
-    "Kendrapara Grid",
-    "⚡",
-    "pin-power",
-    layers.power
-);
 
-labelledMarker(
-    20.30,
-    85.82,
-    "Bhubaneswar Water Facility",
-    "💧",
-    "pin-water",
-    layers.water
-);
+const waterPoints = [
 
-labelledMarker(
-    19.81,
-    85.83,
-    "Puri Water Facility",
-    "💧",
-    "pin-water",
-    layers.water
-);
+    {
+        name:"Kolkata Water Facility",
+        lat:22.57,
+        lon:88.34
+    },
 
-labelledMarker(
-    20.47,
-    85.88,
-    "Cuttack Water Facility",
-    "💧",
-    "pin-water",
-    layers.water
-);
+    {
+        name:"Diamond Harbour Water Facility",
+        lat:22.19,
+        lon:88.24
+    }
+];
 
+
+waterPoints.forEach(item => {
+
+    L.circleMarker(
+        [item.lat,item.lon],
+        {
+            radius:5,
+            color:"#38bdf8",
+            fillColor:"#38bdf8",
+            fillOpacity:.85
+        }
+    )
+    .bindPopup(
+        `<b>${escapeHTML(item.name)}</b><br>Water Infrastructure`
+    )
+    .addTo(layers.water);
+
+});
+
+
+/* =========================================================
+   COASTLINE
+========================================================= */
 
 L.polyline(
     [
-        [19.0,84.8],
-        [19.5,85.0],
-        [20.0,85.3],
-        [20.8,86.0],
-        [21.5,87.0]
+        [21.8,87.7],
+        [21.4,87.8],
+        [21.0,87.9],
+        [20.6,87.8],
+        [20.2,87.7],
+        [19.8,87.5],
+        [19.4,87.2],
+        [19.0,86.9],
+        [18.6,86.5],
+        [18.2,86.2],
+        [17.8,85.9],
+        [17.4,85.6]
     ],
     {
         color:"#22d3ee",
-        weight:3
+        weight:2,
+        opacity:.65,
+        dashArray:"5 6"
     }
-).addTo(layers.coast);
+)
+.bindTooltip("Approximate Coastline")
+.addTo(layers.coast);
 
 
-[
-    [20.30,85.82,400],
-    [20.47,85.88,300],
-    [19.81,85.83,250],
-    [20.50,86.42,180]
-]
-.forEach(
-    x => L.circle(
-        [x[0],x[1]],
+/* =========================================================
+   POPULATION OVERLAY
+========================================================= */
+
+const populationZones = [
+
+    {
+        center:[22.57,88.36],
+        radius:45000,
+        label:"High Population Zone"
+    },
+
+    {
+        center:[21.47,86.90],
+        radius:30000,
+        label:"High Population Zone"
+    },
+
+    {
+        center:[19.81,85.83],
+        radius:25000,
+        label:"High Population Zone"
+    }
+];
+
+
+populationZones.forEach(zone => {
+
+    L.circle(
+        zone.center,
         {
-            radius:x[2]*100,
-            fillOpacity:.12,
+            radius:zone.radius,
+            color:"#a855f7",
+            fillColor:"#a855f7",
+            fillOpacity:.08,
             weight:1
         }
     )
-    .bindPopup("👥 Population zone")
-    .addTo(layers.population)
-);
+    .bindTooltip(zone.label)
+    .addTo(layers.population);
+
+});
 
 
-Object.values(layers).forEach(
-    x => x.addTo(map)
-);
+/* =========================================================
+   TRACKER
+========================================================= */
 
-map.removeLayer(layers.population);
-
-
-/* TRAJECTORY ENGINE */
-
-let tracker = {
+const tracker = {
 
     index:0,
-    marker:null,
-    full:null,
-    traversed:null,
-    radius:null,
-    waypoints:L.layerGroup(),
-    ports:L.layerGroup(),
-    shelters:L.layerGroup(),
-    radars:L.layerGroup()
 
+    marker:null,
+
+    full:null,
+
+    traversed:null,
+
+    radius:null,
+
+    ports:[],
+
+    shelters:[],
+
+    radars:[],
+
+    playing:false,
+
+    interval:null,
+
+    speed:1500
 };
 
 
-function icon(){
+/* =========================================================
+   CATEGORY
+========================================================= */
 
-    return L.divIcon({
+function category(wind){
 
-        className:"",
+    if(wind >= 222) return "SUCS";
 
-        html:
-            '<div class="cyclone-pulse"></div>',
+    if(wind >= 166) return "ESCS";
 
-        iconSize:[24,24],
-        iconAnchor:[12,12]
+    if(wind >= 118) return "VSCS";
 
-    });
+    if(wind >= 88) return "SCS";
 
+    if(wind >= 62) return "CS";
+
+    return "DD";
 }
 
 
-function category(w){
-
-    if(w >= 222)
-        return [
-            "SUCS",
-            "bg-purple-500/20 text-purple-300"
-        ];
-
-    if(w >= 166)
-        return [
-            "ESCS",
-            "bg-purple-500/20 text-purple-300"
-        ];
-
-    if(w >= 118)
-        return [
-            "VSCS",
-            "bg-red-500/20 text-red-300"
-        ];
-
-    if(w >= 88)
-        return [
-            "SCS",
-            "bg-orange-500/20 text-orange-300"
-        ];
-
-    if(w >= 62)
-        return [
-            "CS",
-            "bg-yellow-500/20 text-yellow-300"
-        ];
-
-    return [
-        "DD",
-        "bg-slate-500/20 text-slate-300"
-    ];
-
-}
-
+/* =========================================================
+   BEARING
+========================================================= */
 
 function bearing(a,b){
 
-    const dLon =
-        (b.lon-a.lon)*Math.PI/180;
+    const lat1 = a.lat * Math.PI / 180;
+    const lat2 = b.lat * Math.PI / 180;
 
-    const la1 =
-        a.lat*Math.PI/180;
+    const dLon = (b.lon-a.lon) * Math.PI / 180;
 
-    const la2 =
-        b.lat*Math.PI/180;
-
-    const y =
-        Math.sin(dLon)*Math.cos(la2);
+    const y = Math.sin(dLon) * Math.cos(lat2);
 
     const x =
-        Math.cos(la1)*Math.sin(la2)
-        -
-        Math.sin(la1)*Math.cos(la2)*Math.cos(dLon);
+        Math.cos(lat1) * Math.sin(lat2) -
+        Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
 
-    let deg =
-        (
-            Math.atan2(y,x)*180/Math.PI
-            +360
-        )%360;
+    const angle =
+        (Math.atan2(y,x) * 180 / Math.PI + 360) % 360;
 
-    const dirs = [
-        "N",
-        "NE",
-        "E",
-        "SE",
-        "S",
-        "SW",
-        "W",
-        "NW"
+    const directions = [
+        "N","NE","E","SE","S","SW","W","NW"
     ];
 
-    return dirs[
-        Math.round(deg/45)%8
+    return directions[
+        Math.round(angle / 45) % 8
     ];
-
 }
 
+
+/* =========================================================
+   CLEAR CYCLONE LAYERS
+========================================================= */
 
 function clearTrajectory(){
 
-    [
-        tracker.full,
-        tracker.traversed,
-        tracker.radius,
-        tracker.marker,
-        tracker.waypoints,
-        tracker.ports,
-        tracker.shelters,
-        tracker.radars
-    ]
-    .forEach(x => {
+    if(tracker.full){
+        layers.cyclone.removeLayer(tracker.full);
+    }
 
-        if(x && map.hasLayer(x)){
-            map.removeLayer(x);
-        }
+    if(tracker.traversed){
+        layers.cyclone.removeLayer(tracker.traversed);
+    }
 
-    });
+    if(tracker.radius){
+        layers.cyclone.removeLayer(tracker.radius);
+    }
 
-    tracker.waypoints=L.layerGroup();
-    tracker.ports=L.layerGroup();
-    tracker.shelters=L.layerGroup();
-    tracker.radars=L.layerGroup();
+    tracker.full = null;
+    tracker.traversed = null;
+    tracker.radius = null;
 
 }
 
+
+/* =========================================================
+   INFRASTRUCTURE
+========================================================= */
+
+function renderInfrastructure(){
+
+    layers.shelters.clearLayers();
+
+    tracker.ports.forEach(item => {
+
+        L.marker(
+            [item.lat,item.lon]
+        )
+        .bindPopup(
+            `<b>${escapeHTML(item.name)}</b><br>Port`
+        )
+        .addTo(layers.shelters);
+
+    });
+
+
+    tracker.shelters.forEach(item => {
+
+        L.circleMarker(
+            [item.lat,item.lon],
+            {
+                radius:6,
+                color:"#22c55e",
+                fillColor:"#22c55e",
+                fillOpacity:.9
+            }
+        )
+        .bindPopup(
+            `<b>${escapeHTML(item.name)}</b><br>Relief Shelter`
+        )
+        .addTo(layers.shelters);
+
+    });
+
+
+    tracker.radars.forEach(item => {
+
+        L.circleMarker(
+            [item.lat,item.lon],
+            {
+                radius:6,
+                color:"#a78bfa",
+                fillColor:"#a78bfa",
+                fillOpacity:.9
+            }
+        )
+        .bindPopup(
+            `<b>${escapeHTML(item.name)}</b><br>Weather Radar`
+        )
+        .addTo(layers.shelters);
+
+    });
+
+}
+
+
+/* =========================================================
+   RENDER CYCLONE TRACK
+========================================================= */
 
 function renderTrajectory(){
 
     clearTrajectory();
 
-    const pts =
-        data.track.map(
-            p => [p.lat,p.lon]
-        );
+    const track = data.track || [];
 
-    tracker.full =
-        L.polyline(
-            pts,
-            {
-                color:"#22d3ee",
-                weight:3,
-                dashArray:"8 8",
-                opacity:.8
-            }
-        ).addTo(map);
+    if(!track.length){
+        return;
+    }
 
-
-    tracker.traversed =
-        L.polyline(
-            [],
-            {
-                color:"#ef4444",
-                weight:5
-            }
-        ).addTo(map);
-
-
-    data.track.forEach(
-        (p,i) => {
-
-            L.circleMarker(
-                [p.lat,p.lon],
-                {
-                    radius:4,
-                    color:"#f87171",
-                    fillColor:"#ef4444",
-                    fillOpacity:1
-                }
-            )
-            .bindTooltip(
-                `${p.timestamp}<br>Wind: ${p.wind} km/h`
-            )
-            .on(
-                "click",
-                () => jump(i)
-            )
-            .addTo(tracker.waypoints);
-
-        }
+    const points = track.map(
+        p => [Number(p.lat),Number(p.lon)]
     );
 
 
-    tracker.waypoints.addTo(map);
-
-
-    const addInfra =
-        (arr,group,emoji,cls) => {
-
-            arr.forEach(
-                p => {
-
-                    const ic =
-                        L.divIcon({
-
-                            className:"map-label-icon",
-
-                            html:`
-                                <div class="map-pin ${cls}">
-                                    <span class="pin-icon">
-                                        ${emoji}
-                                    </span>
-                                    <span>
-                                        ${p.name}
-                                    </span>
-                                </div>
-                            `,
-
-                            iconSize:null,
-                            iconAnchor:[12,12]
-
-                        });
-
-
-                    L.marker(
-                        [p.lat,p.lon],
-                        {icon:ic}
-                    )
-                    .bindPopup(
-                        `<b>${emoji} ${p.name}</b>`
-                    )
-                    .addTo(group);
-
-                }
-            );
-
-            group.addTo(map);
-
-        };
-
-
-    addInfra(
-        data.infrastructure?.ports || [],
-        tracker.ports,
-        "⚓",
-        "pin-port"
-    );
-
-    addInfra(
-        data.infrastructure?.shelters || [],
-        tracker.shelters,
-        "🛟",
-        "pin-shelter"
-    );
-
-    addInfra(
-        data.infrastructure?.radars || [],
-        tracker.radars,
-        "📡",
-        "pin-radar"
-    );
-
-
-    tracker.marker =
-        L.marker(
-            [
-                data.track[0].lat,
-                data.track[0].lon
-            ],
-            {
-                icon:icon()
-            }
-        ).addTo(map);
-
-
-    tracker.radius =
-        L.circle(
-            [
-                data.track[0].lat,
-                data.track[0].lon
-            ],
-            {
-                radius:50000,
-                color:"#ef4444",
-                fillColor:"#ef4444",
-                fillOpacity:.08
-            }
-        ).addTo(map);
-
-
-    jump(0);
-
-    map.fitBounds(
-        tracker.full.getBounds(),
+    tracker.full = L.polyline(
+        points,
         {
-            padding:[80,80]
+            color:"#ef4444",
+            weight:3,
+            opacity:.45,
+            dashArray:"8 7"
         }
+    ).addTo(layers.cyclone);
+
+
+    tracker.traversed = L.polyline(
+        points.slice(0,tracker.index+1),
+        {
+            color:"#ef4444",
+            weight:5,
+            opacity:.95
+        }
+    ).addTo(layers.cyclone);
+
+
+    const current = track[tracker.index];
+
+    if(!current){
+        return;
+    }
+
+
+    tracker.marker = L.marker(
+        [current.lat,current.lon],
+        {
+            icon:L.divIcon({
+                className:"",
+                html:`<div class="cyclone-marker"></div>`,
+                iconSize:[18,18],
+                iconAnchor:[9,9]
+            })
+        }
+    )
+    .bindPopup(
+        `<b>${escapeHTML(data.name)}</b><br>
+         ${escapeHTML(current.timestamp)}<br>
+         Wind: ${current.wind} km/h`
+    )
+    .addTo(layers.cyclone);
+
+
+    const radiusKm = Math.max(
+        45,
+        Number(current.wind || 60) * 0.55
     );
+
+
+    tracker.radius = L.circle(
+        [current.lat,current.lon],
+        {
+            radius:radiusKm * 1000,
+            color:"#ef4444",
+            fillColor:"#ef4444",
+            fillOpacity:.06,
+            weight:1,
+            dashArray:"4 6"
+        }
+    ).addTo(layers.cyclone);
+
+
+    updateInfrastructureVisibility();
 
 }
 
 
-function jump(i){
+/* =========================================================
+   UPDATE INFRASTRUCTURE VISIBILITY
+========================================================= */
 
-    tracker.index =
-        Math.max(
-            0,
-            Math.min(
-                i,
-                data.track.length-1
-            )
-        );
+function updateInfrastructureVisibility(){
 
-    const p =
-        data.track[tracker.index];
+    const portsToggle = $("portsToggle");
+    const sheltersToggle = $("sheltersToggle");
+    const radarsToggle = $("radarsToggle");
+    const radiusToggle = $("radiusToggle");
 
-    tracker.marker.setLatLng(
-        [p.lat,p.lon]
+    if(portsToggle && !portsToggle.checked){
+        layers.shelters.eachLayer(layer => {
+            if(layer._popup){
+                const content = layer.getPopup()?.getContent() || "";
+                if(String(content).includes("Port")){
+                    layers.shelters.removeLayer(layer);
+                }
+            }
+        });
+    }
+
+    if(radiusToggle && !radiusToggle.checked && tracker.radius){
+        layers.cyclone.removeLayer(tracker.radius);
+    }
+
+}
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+function jump(index){
+
+    if(!data.track || !data.track.length){
+        return;
+    }
+
+    index = Math.max(
+        0,
+        Math.min(index,data.track.length-1)
     );
 
-    tracker.radius
-        .setLatLng([p.lat,p.lon])
-        .setRadius(
-            Math.max(
-                25000,
-                p.wind*700
-            )
-        );
+    tracker.index = index;
 
-    tracker.traversed.setLatLngs(
-        data.track
-        .slice(0,tracker.index+1)
-        .map(
-            x => [x.lat,x.lon]
-        )
-    );
+    $("timeSlider").value = index;
 
-    timeSlider.value =
-        tracker.index;
-
-    timeDisplay.textContent =
-        p.timestamp;
+    renderTrajectory();
 
     updateTelemetry();
-    updateRouteForTime(tracker.index);
-    
+
+    updateRouteForTime(index);
+
+    updateFeedbackPosition();
 
 }
 
+
+/* =========================================================
+   TELEMETRY
+========================================================= */
 
 function updateTelemetry(){
 
-    const i =
-        tracker.index;
+    const track = data.track || [];
 
-    const p =
-        data.track[i];
+    const point = track[tracker.index];
 
-    const c =
-        category(p.wind);
-
-
-    stormName.textContent =
-        (data.name || "CUSTOM STORM")
-        .toUpperCase();
+    if(!point){
+        return;
+    }
 
 
-    categoryEl.textContent =
-        c[0];
-
-    categoryEl.className =
-        `text-[10px] rounded px-2 py-1 ${c[1]}`;
-
-
-    wind.textContent =
-        p.wind;
-
-    pressure.textContent =
-        p.pressure || "—";
+    const previous =
+        tracker.index > 0
+            ? track[tracker.index-1]
+            : null;
 
 
-    timestamp.textContent =
-        p.timestamp;
+    setText(
+        "stormName",
+        data.name || "CYCLONE"
+    );
+
+    setText(
+        "basin",
+        data.basin || "Unknown"
+    );
+
+    setText(
+        "wind",
+        `${point.wind ?? "—"} km/h`
+    );
+
+    setText(
+        "pressure",
+        `${point.pressure ?? "—"} hPa`
+    );
+
+    setText(
+        "timestamp",
+        point.timestamp || `T-${point.landfallIn ?? "?"}h`
+    );
+
+    setText(
+        "landfall",
+        point.landfallIn === 0
+            ? "NOW"
+            : `${point.landfallIn ?? "—"}h`
+    );
+
+    setText(
+        "coords",
+        `${Number(point.lat).toFixed(3)}, ${Number(point.lon).toFixed(3)}`
+    );
+
+    setText(
+        "timelineLabel",
+        point.timestamp || "—"
+    );
+
+    setText(
+        "timelineWind",
+        `${point.wind ?? "—"} km/h`
+    );
+
+    setText(
+        "mobileStorm",
+        data.name || "CYCLONE"
+    );
+
+    setText(
+        "mobileTimeline",
+        point.timestamp || "—"
+    );
+
+    setText(
+        "mobileWind",
+        `${point.wind ?? "—"} km/h`
+    );
 
 
-    coords.textContent =
-        `${p.lat.toFixed(2)}°N, ${p.lon.toFixed(2)}°E`;
+    const stormCategory = category(
+        Number(point.wind || 0)
+    );
+
+    const categoryEl = $("category");
+
+    if(categoryEl){
+
+        categoryEl.textContent = stormCategory;
+
+        categoryEl.className =
+            "badge " +
+            (
+                Number(point.wind || 0) >= 118
+                    ? "badge-red"
+                    : Number(point.wind || 0) >= 88
+                        ? "badge-yellow"
+                        : "badge-blue"
+            );
+    }
 
 
-    heading.textContent =
-        i
-        ? bearing(
-            data.track[i-1],
-            p
-        )
-        : "—";
+    if(previous){
 
+        setText(
+            "heading",
+            bearing(previous,point)
+        );
 
-    landfall.textContent =
-        p.landfallIn === 0
-        ? "LANDFALL STRIKE IN PROGRESS / INLAND"
-        : `IN ~${p.landfallIn || 0} HOURS`;
+    }else{
 
+        setText(
+            "heading",
+            "—"
+        );
 
-    sliderStart.textContent =
-        data.track[0].timestamp;
-
-    sliderEnd.textContent =
-        data.track[data.track.length-1].timestamp;
-
-
-    peak.textContent =
-        `Peak ${Math.max(
-            ...data.track.map(
-                x => x.wind
-            )
-        )} km/h`;
+    }
 
 
     drawSpark();
 
-
-    addLog(
-        `Fix: ${p.lat.toFixed(2)}°N, ${p.lon.toFixed(2)}°E | Wind: ${p.wind} km/h (${p.timestamp})`
-    );
+}
 
 
-    /* UPDATE HUMAN FEEDBACK LOCATION */
+/* =========================================================
+   SPARKLINE
+========================================================= */
 
-    if(typeof updateFeedbackContext === "function"){
-        updateFeedbackContext();
+function drawSpark(){
+
+    const canvas = $("spark");
+
+    if(!canvas){
+        return;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    const width = canvas.clientWidth || 280;
+    const height = 55;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.clearRect(0,0,width,height);
+
+    const values =
+        (data.track || []).map(
+            p => Number(p.wind || 0)
+        );
+
+    if(!values.length){
+        return;
+    }
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    ctx.beginPath();
+
+    values.forEach((value,index) => {
+
+        const x =
+            values.length === 1
+                ? width/2
+                : index * (width/(values.length-1));
+
+        const normalized =
+            max === min
+                ? .5
+                : (value-min)/(max-min);
+
+        const y =
+            height - 7 - normalized*(height-14);
+
+        if(index === 0){
+            ctx.moveTo(x,y);
+        }else{
+            ctx.lineTo(x,y);
+        }
+
+    });
+
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+
+    const current = tracker.index;
+
+    if(values[current] !== undefined){
+
+        const x =
+            values.length === 1
+                ? width/2
+                : current * (width/(values.length-1));
+
+        const normalized =
+            max === min
+                ? .5
+                : (values[current]-min)/(max-min);
+
+        const y =
+            height - 7 - normalized*(height-14);
+
+        ctx.beginPath();
+        ctx.arc(x,y,4,0,Math.PI*2);
+        ctx.fillStyle = "#ef4444";
+        ctx.fill();
+
     }
 
 }
 
 
-function drawSpark(){
+/* =========================================================
+   ROUTING STAGE SELECTION
+========================================================= */
 
-    const c =
-        document.getElementById("spark");
+function getRouteStage(landfallHours){
 
-    const ctx =
-        c.getContext("2d");
+    const hours = Number(landfallHours);
 
-    const w =
-        c.width =
-        c.clientWidth*2;
+    if(!Number.isFinite(hours)){
+        return 48;
+    }
 
-    const h =
-        c.height =
-        80*2;
+    if(hours >= 25){
+        return 48;
+    }
 
-    ctx.clearRect(
-        0,
-        0,
-        w,
-        h
-    );
+    if(hours >= 13){
+        return 24;
+    }
+
+    if(hours >= 7){
+        return 12;
+    }
+
+    if(hours >= 1){
+        return 6;
+    }
+
+    return 0;
+}
 
 
-    const vals =
-        data.track.map(
-            x => x.wind
+/* =========================================================
+   ROUTING RENDER
+========================================================= */
+
+function updateRouteForTime(index){
+
+    if(!routingData || !routingData.routes){
+        return;
+    }
+
+    if(!data || !data.track || !data.track.length){
+        return;
+    }
+
+    const point = data.track[index];
+
+    if(!point){
+        return;
+    }
+
+    const landfall = Number(point.landfallIn);
+
+    const stage = getRouteStage(landfall);
+
+    const route = routingData.routes[String(stage)];
+
+    if(!route){
+        setText(
+            "routing-note",
+            `No route available for ${stage}h stage.`
         );
 
-    const max =
-        Math.max(...vals);
+        return;
+    }
 
-    const min =
-        Math.min(...vals);
-
-
-    const X =
-        i =>
-            i*(w-20)/
-            (vals.length-1)+10;
+    activeRouteStage = stage;
 
 
-    const Y =
-        v =>
-            h-10
-            -
-            (v-min)/
-            Math.max(1,max-min)
-            *(h-20);
+    if(activeRouteLayer){
+
+        map.removeLayer(activeRouteLayer);
+
+        activeRouteLayer = null;
+
+    }
 
 
-    ctx.strokeStyle =
-        "#38bdf8";
+    if(activeRouteStart){
 
-    ctx.lineWidth =
-        4;
+        map.removeLayer(activeRouteStart);
 
-    ctx.beginPath();
+        activeRouteStart = null;
+
+    }
 
 
-    vals.forEach(
-        (v,i) => {
+    if(activeRouteEnd){
 
-            if(i)
-                ctx.lineTo(
-                    X(i),
-                    Y(v)
-                );
-            else
-                ctx.moveTo(
-                    X(i),
-                    Y(v)
-                );
+        map.removeLayer(activeRouteEnd);
 
-        }
+        activeRouteEnd = null;
+
+    }
+
+
+    const path =
+        Array.isArray(route.path)
+            ? route.path
+            : [];
+
+
+    if(path.length){
+
+        activeRouteLayer = L.polyline(
+            path,
+            {
+                color:"#38bdf8",
+                weight:5,
+                opacity:.95,
+                lineCap:"round",
+                lineJoin:"round"
+            }
+        )
+        .bindTooltip(
+            `Disaster-aware route · T-${stage}h`,
+            {
+                sticky:true
+            }
+        )
+        .addTo(map);
+
+
+        activeRouteStart = L.marker(
+            path[0],
+            {
+                icon:L.divIcon({
+                    className:"",
+                    html:`<div class="route-start"></div>`,
+                    iconSize:[12,12],
+                    iconAnchor:[6,6]
+                })
+            }
+        )
+        .bindPopup(
+            `<b>Route Start</b><br>
+             ${Number(path[0][0]).toFixed(6)},
+             ${Number(path[0][1]).toFixed(6)}`
+        )
+        .addTo(map);
+
+
+        activeRouteEnd = L.marker(
+            path[path.length-1],
+            {
+                icon:L.divIcon({
+                    className:"",
+                    html:`<div class="route-end"></div>`,
+                    iconSize:[12,12],
+                    iconAnchor:[6,6]
+                })
+            }
+        )
+        .bindPopup(
+            `<b>Route Destination</b><br>
+             ${Number(path[path.length-1][0]).toFixed(6)},
+             ${Number(path[path.length-1][1]).toFixed(6)}`
+        )
+        .addTo(map);
+
+    }
+
+
+    setText(
+        "route-stage",
+        `T-${stage}h`
     );
 
-    ctx.stroke();
+    setText(
+        "route-cost",
+        Number(route.routing_cost).toFixed(2)
+    );
+
+    setText(
+        "route-change",
+        `${Number(route.change_percent).toFixed(2)}%`
+    );
+
+    setText(
+        "route-nodes",
+        route.route_nodes ?? "—"
+    );
+
+    setText(
+        "route-landfall",
+        `${route.time_to_landfall_h ?? stage}h`
+    );
+
+    setText(
+        "mobileRoute",
+        `Route: ${stage}h`
+    );
+
+    setText(
+        "routing-note",
+        `Route automatically selected for the current cyclone time-to-landfall. ${route.route_nodes} route nodes.`
+    );
 
 
-    vals.forEach(
-        (v,i) => {
+    const status = $("routing-status");
 
-            ctx.beginPath();
+    if(status){
 
-            ctx.arc(
-                X(i),
-                Y(v),
-                i===tracker.index
-                ?8
-                :4,
-                0,
-                Math.PI*2
+        status.textContent = `T-${stage}h`;
+
+        status.className =
+            "badge " +
+            (
+                stage <= 6
+                    ? "badge-red"
+                    : stage <= 12
+                        ? "badge-yellow"
+                        : "badge-blue"
             );
 
-            ctx.fillStyle =
-                i===tracker.index
-                ? "#ef4444"
-                : "#64748b";
+    }
 
-            ctx.fill();
+
+    const routeToggle = $("routeToggle");
+
+    if(routeToggle && !routeToggle.checked){
+
+        if(activeRouteLayer){
+
+            map.removeLayer(activeRouteLayer);
+            activeRouteLayer = null;
 
         }
+
+        if(activeRouteStart){
+
+            map.removeLayer(activeRouteStart);
+            activeRouteStart = null;
+
+        }
+
+        if(activeRouteEnd){
+
+            map.removeLayer(activeRouteEnd);
+            activeRouteEnd = null;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD ROUTING DATA
+========================================================= */
+
+async function loadRouting(){
+
+    try{
+
+        const result = await getJSON("/routing");
+
+        if(
+            !result ||
+            !result.routes
+        ){
+            throw new Error("Invalid routing response");
+        }
+
+        routingData = result;
+
+        setText(
+            "routing-note",
+            "Routing data loaded successfully."
+        );
+
+        const status = $("routing-status");
+
+        if(status){
+
+            status.textContent = "ONLINE";
+            status.className = "badge badge-green";
+
+        }
+
+        updateRouteForTime(tracker.index);
+
+    }catch(error){
+
+        console.error("Routing error:",error);
+
+        routingData = null;
+
+        const status = $("routing-status");
+
+        if(status){
+
+            status.textContent = "ERROR";
+            status.className = "badge badge-red";
+
+        }
+
+        setText(
+            "routing-note",
+            "Routing backend unavailable. The cyclone dashboard can still run locally."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ADVISORY
+========================================================= */
+
+function formatAdvisory(text){
+
+    if(!text){
+        return "No advisory available.";
+    }
+
+    const clean = String(text).trim();
+
+    if(!clean){
+        return "No advisory available.";
+    }
+
+    return escapeHTML(clean)
+        .replace(/\n\n+/g,"<br><br>")
+        .replace(/\n/g,"<br>");
+
+}
+
+
+async function loadAdvisory(){
+
+    try{
+
+        const result = await getJSON("/advisory");
+
+        if(
+            !result ||
+            !result.advisory
+        ){
+            throw new Error("Advisory missing");
+        }
+
+        $("ai-advisory").innerHTML =
+            formatAdvisory(result.advisory);
+
+
+        const status = $("advisoryStatus");
+
+        if(status){
+
+            status.textContent = "ONLINE";
+            status.className = "badge badge-green";
+
+        }
+
+    }catch(error){
+
+        console.error("Advisory error:",error);
+
+        $("ai-advisory").textContent =
+            "Advisory unavailable. The backend endpoint could not be reached.";
+
+        const status = $("advisoryStatus");
+
+        if(status){
+
+            status.textContent = "OFFLINE";
+            status.className = "badge badge-red";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   BACKEND HEALTH
+========================================================= */
+
+async function checkBackend(){
+
+    try{
+
+        const result = await getJSON("/health");
+
+        if(result && result.status === "healthy"){
+
+            setBadge(
+                "ONLINE",
+                "badge-green"
+            );
+
+        }else{
+
+            setBadge(
+                "CONNECTED",
+                "badge-blue"
+            );
+
+        }
+
+        return true;
+
+    }catch(error){
+
+        console.error("Backend health error:",error);
+
+        setBadge(
+            "OFFLINE",
+            "badge-red"
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   FLOOD PREDICTION
+========================================================= */
+
+async function runFloodPrediction(){
+
+    const button = $("runPredictionBtn");
+
+    const status = $("flood-model-status");
+
+    if(button){
+
+        button.disabled = true;
+        button.textContent = "Running...";
+
+    }
+
+    if(status){
+
+        status.textContent = "RUNNING";
+        status.className = "badge badge-yellow";
+
+    }
+
+
+    const point =
+        data.track[tracker.index] ||
+        data.track[0];
+
+
+    /*
+       The existing backend requires:
+
+       elevation
+       distance_to_coast
+       rainfall
+       population
+       slope
+
+       Since the current frontend does not contain a
+       dedicated input form, representative values are
+       derived from the current cyclone state.
+
+       The backend itself remains unchanged.
+    */
+
+    const payload = {
+
+        elevation:10,
+
+        distance_to_coast:25,
+
+        rainfall:Math.max(
+            50,
+            Number(point.wind || 0) * 1.2
+        ),
+
+        population:100000,
+
+        slope:1.5
+
+    };
+
+
+    try{
+
+        const response =
+            await fetch(
+                API_BASE_URL + "/predict",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":"application/json",
+                        "Accept":"application/json"
+                    },
+
+                    body:JSON.stringify(payload)
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                `/predict returned ${response.status}`
+            );
+
+        }
+
+
+        const result = await response.json();
+
+
+        const probability =
+            Number(result.flood_probability);
+
+
+        setText(
+            "flood-probability",
+            Number.isFinite(probability)
+                ? `${(probability*100).toFixed(1)}%`
+                : "—"
+        );
+
+
+        setText(
+            "flood-risk-class",
+            result.risk_class ?? "—"
+        );
+
+
+        setText(
+            "flood-model-note",
+            `RF prediction generated from the current cyclone state.`
+        );
+
+
+        if(status){
+
+            status.textContent = "ONLINE";
+            status.className = "badge badge-green";
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Flood prediction error:",
+            error
+        );
+
+
+        setText(
+            "flood-probability",
+            "—"
+        );
+
+
+        setText(
+            "flood-risk-class",
+            "—"
+        );
+
+
+        setText(
+            "flood-model-note",
+            "Flood prediction unavailable. Check that the deployed model backend is running."
+        );
+
+
+        if(status){
+
+            status.textContent = "ERROR";
+            status.className = "badge badge-red";
+
+        }
+
+    }finally{
+
+        if(button){
+
+            button.disabled = false;
+            button.textContent = "Run Flood Prediction";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   FEEDBACK
+========================================================= */
+
+let selectedRating = 0;
+
+
+function getFeedback(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem("charybdis_feedback") || "[]"
+        );
+
+    }catch{
+
+        return [];
+
+    }
+
+}
+
+
+function saveFeedback(items){
+
+    localStorage.setItem(
+        "charybdis_feedback",
+        JSON.stringify(items)
     );
 
 }
 
 
-function addLog(msg,hi=false){
+function updateFeedbackPosition(){
 
-    const d =
-        document.createElement("div");
+    const point =
+        data.track[tracker.index];
 
-    d.className =
-        hi
-        ? "text-sky-300"
-        : "text-slate-400";
+    if(!point){
+        return;
+    }
 
-    d.textContent =
-        `[${new Date().toLocaleTimeString()}] ${msg}`;
+    setText(
+        "feedbackCoords",
+        `${Number(point.lat).toFixed(4)}, ${Number(point.lon).toFixed(4)}`
+    );
 
-    log.appendChild(d);
-
-    log.scrollTop =
-        log.scrollHeight;
-
-}
-
-
-/* CONTROLS */
-
-const prevBtn =
-    document.getElementById("prevBtn");
-
-const nextBtn =
-    document.getElementById("nextBtn");
-
-const playBtn =
-    document.getElementById("playBtn");
-
-const histBtn =
-    document.getElementById("histBtn");
-
-const liveBtn =
-    document.getElementById("liveBtn");
-
-const jsonBtn =
-    document.getElementById("jsonBtn");
-
-const cycloneToggle =
-    document.getElementById("cycloneToggle");
-
-const feedStatus =
-    document.getElementById("feedStatus");
-
-const jsonModal =
-    document.getElementById("jsonModal");
-
-const jsonInput =
-    document.getElementById("jsonInput");
-
-const closeJson =
-    document.getElementById("closeJson");
-
-const resetJson =
-    document.getElementById("resetJson");
-
-const applyJson =
-    document.getElementById("applyJson");
-
-const logToggle =
-    document.getElementById("logToggle");
-
-
-const timeSlider =
-    document.getElementById("timeSlider");
-
-const timeDisplay =
-    document.getElementById("timeDisplay");
-
-
-const stormName =
-    document.getElementById("stormName");
-
-const categoryEl =
-    document.getElementById("category");
-
-const wind =
-    document.getElementById("wind");
-
-const pressure =
-    document.getElementById("pressure");
-
-const timestamp =
-    document.getElementById("timestamp");
-
-const coords =
-    document.getElementById("coords");
-
-const heading =
-    document.getElementById("heading");
-
-const landfall =
-    document.getElementById("landfall");
-
-const sliderStart =
-    document.getElementById("sliderStart");
-
-const sliderEnd =
-    document.getElementById("sliderEnd");
-
-const peak =
-    document.getElementById("peak");
-
-const log =
-    document.getElementById("log");
-
-
-function configure(){
-
-    timeSlider.max =
-        data.track.length-1;
-
-    timeSlider.value =
-        tracker.index;
-
-    sliderStart.textContent =
-        data.track[0].timestamp;
-
-    sliderEnd.textContent =
-        data.track[
-            data.track.length-1
-        ].timestamp;
+    setText(
+        "feedbackTime",
+        `${point.timestamp || "Current"} · ${new Date().toLocaleString()}`
+    );
 
 }
 
 
-timeSlider.oninput =
-    e => {
+function renderFeedbackDashboard(){
 
-        stop();
+    const items = getFeedback();
 
-        jump(
-            +e.target.value
+    setText(
+        "feedbackTotal",
+        items.length
+    );
+
+
+    if(items.length){
+
+        const average =
+            items.reduce(
+                (sum,item) =>
+                    sum + Number(item.safety_rating || 0),
+                0
+            ) / items.length;
+
+        setText(
+            "feedbackAverage",
+            average.toFixed(1)
         );
+
+
+        const high =
+            items.filter(
+                item => item.severity === "High"
+            ).length;
+
+        setText(
+            "feedbackHigh",
+            high
+        );
+
+    }else{
+
+        setText(
+            "feedbackAverage",
+            "—"
+        );
+
+        setText(
+            "feedbackHigh",
+            "0"
+        );
+
+    }
+
+
+    const container = $("recentFeedback");
+
+    if(!container){
+        return;
+    }
+
+
+    if(!items.length){
+
+        container.innerHTML =
+            `<div class="text-[10px] text-slate-500">
+                No feedback yet.
+             </div>`;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        items
+            .slice()
+            .reverse()
+            .slice(0,10)
+            .map(item => {
+
+                return `
+                    <div class="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
+                        <div class="flex justify-between">
+                            <span class="text-[10px] font-bold text-white">
+                                ${escapeHTML(item.report_type)}
+                            </span>
+
+                            <span class="text-[10px] text-yellow-400">
+                                ${"★".repeat(Number(item.safety_rating || 0))}
+                            </span>
+                        </div>
+
+                        <div class="text-[10px] text-slate-500 mt-1">
+                            Severity: ${escapeHTML(item.severity)}
+                        </div>
+
+                        <div class="text-[10px] text-slate-400 mt-1">
+                            ${escapeHTML(item.description || "No description")}
+                        </div>
+                    </div>
+                `;
+
+            })
+            .join("");
+
+}
+
+
+function submitFeedbackLocal(){
+
+    const reportType =
+        document.querySelector(
+            'input[name="reportType"]:checked'
+        )?.value || "Other";
+
+
+    const severity =
+        document.querySelector(
+            'input[name="severity"]:checked'
+        )?.value || "Low";
+
+
+    const description =
+        $("feedbackComment").value.trim();
+
+
+    if(selectedRating < 1){
+
+        $("feedbackMessage").textContent =
+            "Please select a safety rating.";
+
+        return;
+
+    }
+
+
+    const point =
+        data.track[tracker.index];
+
+
+    const item = {
+
+        safety_rating:selectedRating,
+
+        report_type:reportType,
+
+        severity:severity,
+
+        description:description,
+
+        latitude:Number(point.lat),
+
+        longitude:Number(point.lon),
+
+        timestamp:new Date().toISOString(),
+
+        cyclone_time:
+            point.timestamp || ""
 
     };
 
 
-prevBtn.onclick =
-    () => {
+    const items = getFeedback();
 
-        stop();
+    items.push(item);
 
-        jump(
-            tracker.index-1
+    saveFeedback(items);
+
+
+    $("feedbackMessage").textContent =
+        "Feedback saved locally.";
+
+
+    $("feedbackComment").value = "";
+
+    $("charCount").textContent = "0/500";
+
+
+    selectedRating = 0;
+
+    document
+        .querySelectorAll(".feedback-star")
+        .forEach(star =>
+            star.classList.remove("active")
         );
 
-    };
+
+    renderFeedbackDashboard();
 
 
-nextBtn.onclick =
-    () => {
+    $("humanSignalBar").textContent =
+        "Human signal recorded";
 
-        stop();
+}
 
-        jump(
-            tracker.index+1
+
+/* =========================================================
+   JSON IMPORT
+========================================================= */
+
+function openJSONModal(){
+
+    $("jsonModal").classList.add("show");
+
+    $("jsonInput").value =
+        JSON.stringify(
+            data,
+            null,
+            2
         );
 
-    };
+}
 
 
-playBtn.onclick =
-    () =>
-        playback
-        ? stop()
-        : start();
+function closeJSONModal(){
+
+    $("jsonModal").classList.remove("show");
+
+}
 
 
-function start(){
+function applyJSON(){
 
-    playBtn.textContent =
-        "⏸";
+    const message = $("jsonMessage");
 
-    playback =
-        setInterval(
-            () => {
+    try{
 
-                jump(
-                    (tracker.index+1)
-                    %
-                    data.track.length
+        const parsed =
+            JSON.parse(
+                $("jsonInput").value
+            );
+
+
+        if(
+            !parsed ||
+            !Array.isArray(parsed.track) ||
+            parsed.track.length === 0
+        ){
+
+            throw new Error(
+                "Dataset must contain a non-empty track array."
+            );
+
+        }
+
+
+        parsed.track.forEach((point,index) => {
+
+            if(
+                !Number.isFinite(Number(point.lat)) ||
+                !Number.isFinite(Number(point.lon))
+            ){
+
+                throw new Error(
+                    `Track point ${index+1} has invalid coordinates.`
                 );
 
-            },
-            speed
+            }
+
+        });
+
+
+        data = parsed;
+
+        tracker.index = 0;
+
+        $("timeSlider").max =
+            data.track.length - 1;
+
+        $("timeSlider").value = 0;
+
+
+        tracker.ports =
+            data.infrastructure?.ports || [];
+
+        tracker.shelters =
+            data.infrastructure?.shelters || [];
+
+        tracker.radars =
+            data.infrastructure?.radars || [];
+
+
+        renderInfrastructure();
+
+        renderTrajectory();
+
+        updateTelemetry();
+
+        updateRouteForTime(0);
+
+        updateFeedbackPosition();
+
+
+        message.textContent =
+            "Dataset applied successfully.";
+
+        message.className =
+            "text-[10px] mt-3 text-green-400";
+
+
+        setTimeout(
+            closeJSONModal,
+            700
         );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        message.textContent =
+            error.message;
+
+        message.className =
+            "text-[10px] mt-3 text-red-400";
+
+    }
 
 }
 
 
-function stop(){
+/* =========================================================
+   LIVE SIMULATION
+========================================================= */
+
+function startSimulation(){
+
+    if(tracker.playing){
+        stopSimulation();
+        return;
+    }
+
+
+    tracker.playing = true;
+
+
+    const icon =
+        $("playBtn").querySelector("i");
+
+    if(icon){
+        icon.setAttribute(
+            "data-lucide",
+            "pause"
+        );
+    }
+
+
+    tracker.interval =
+        setInterval(() => {
+
+            if(
+                tracker.index >=
+                data.track.length - 1
+            ){
+
+                stopSimulation();
+
+                return;
+
+            }
+
+
+            jump(
+                tracker.index + 1
+            );
+
+        },tracker.speed);
+
+
+    lucide.createIcons();
+
+}
+
+
+function stopSimulation(){
+
+    tracker.playing = false;
 
     clearInterval(
-        playback
+        tracker.interval
     );
 
-    playback =
-        null;
+    tracker.interval = null;
 
-    playBtn.textContent =
-        "▶";
+
+    const button = $("playBtn");
+
+    if(button){
+
+        button.innerHTML =
+            `<i data-lucide="play" class="w-4 h-4"></i>`;
+
+        lucide.createIcons();
+
+    }
 
 }
 
 
-document.querySelectorAll(".speed")
-.forEach(
-    b =>
-        b.onclick =
-        () => {
+/* =========================================================
+   EVENT LISTENERS
+========================================================= */
 
-            speed =
-                +b.dataset.speed;
+$("timeSlider").addEventListener(
+    "input",
+    event => {
+        jump(
+            Number(event.target.value)
+        );
+    }
+);
 
-            document
-            .querySelectorAll(".speed")
-            .forEach(
-                x =>
-                    x.classList.remove(
-                        "bg-sky-500/20",
-                        "text-sky-300"
-                    )
+
+$("prevBtn").addEventListener(
+    "click",
+    () => {
+        jump(tracker.index - 1);
+    }
+);
+
+
+$("nextBtn").addEventListener(
+    "click",
+    () => {
+        jump(tracker.index + 1);
+    }
+);
+
+
+$("playBtn").addEventListener(
+    "click",
+    startSimulation
+);
+
+
+document
+    .querySelectorAll(".speed-btn")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                tracker.speed =
+                    Number(
+                        button.dataset.speed
+                    );
+
+
+                if(tracker.playing){
+
+                    stopSimulation();
+
+                    startSimulation();
+
+                }
+
+            }
+        );
+
+    });
+
+
+document
+    .querySelectorAll(".base-btn")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const name =
+                    button.dataset.base;
+
+                Object.values(baseLayers)
+                    .forEach(layer => {
+
+                        if(map.hasLayer(layer)){
+                            map.removeLayer(layer);
+                        }
+
+                    });
+
+
+                baseLayers[name].addTo(map);
+
+            }
+        );
+
+    });
+
+
+document
+    .querySelectorAll(".toggle")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const layerName =
+                    button.dataset.layer;
+
+                const layer =
+                    layers[layerName];
+
+                if(!layer){
+                    return;
+                }
+
+
+                if(map.hasLayer(layer)){
+
+                    map.removeLayer(layer);
+
+                    button.classList.remove(
+                        "active"
+                    );
+
+                }else{
+
+                    layer.addTo(map);
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                }
+
+            }
+        );
+
+    });
+
+
+$("routeToggle").addEventListener(
+    "change",
+    event => {
+
+        if(event.target.checked){
+
+            updateRouteForTime(
+                tracker.index
             );
 
-            b.classList.add(
-                "bg-sky-500/20",
-                "text-sky-300"
-            );
+        }else{
 
-            if(playback){
+            if(activeRouteLayer){
 
-                stop();
+                map.removeLayer(
+                    activeRouteLayer
+                );
 
-                start();
+                activeRouteLayer = null;
+
+            }
+
+            if(activeRouteStart){
+
+                map.removeLayer(
+                    activeRouteStart
+                );
+
+                activeRouteStart = null;
+
+            }
+
+            if(activeRouteEnd){
+
+                map.removeLayer(
+                    activeRouteEnd
+                );
+
+                activeRouteEnd = null;
 
             }
 
         }
-);
-
-
-/* LAYER TOGGLES */
-
-const toggleMap = {
-
-    roadsToggle:"roads",
-    hospitalToggle:"hospitals",
-    shelterToggle:"shelters",
-    powerToggle:"power",
-    waterToggle:"water",
-    coastToggle:"coast",
-    populationToggle:"population"
-
-};
-
-
-Object.entries(toggleMap)
-.forEach(
-    ([id,key]) => {
-
-        document
-        .getElementById(id)
-        .onchange =
-            e =>
-                e.target.checked
-                ? map.addLayer(
-                    layers[key]
-                )
-                : map.removeLayer(
-                    layers[key]
-                );
 
     }
 );
 
 
-cycloneToggle.onchange =
-    e => {
+$("radiusToggle").addEventListener(
+    "change",
+    event => {
 
-        if(e.target.checked){
+        if(
+            tracker.radius &&
+            event.target.checked
+        ){
 
-            tracker.full.addTo(map);
-            tracker.traversed.addTo(map);
-            tracker.waypoints.addTo(map);
-            tracker.marker.addTo(map);
-
-        }
-        else{
-
-            [
-                tracker.full,
-                tracker.traversed,
-                tracker.waypoints,
-                tracker.marker
-            ]
-            .forEach(
-                x =>
-                    map.removeLayer(x)
+            tracker.radius.addTo(
+                layers.cyclone
             );
 
         }
 
-    };
+        if(
+            tracker.radius &&
+            !event.target.checked
+        ){
 
-
-document
-.getElementById("layer-ports")
-.onchange =
-    e =>
-        e.target.checked
-        ? tracker.ports.addTo(map)
-        : map.removeLayer(
-            tracker.ports
-        );
-
-
-document
-.getElementById("layer-shelters")
-.onchange =
-    e =>
-        e.target.checked
-        ? tracker.shelters.addTo(map)
-        : map.removeLayer(
-            tracker.shelters
-        );
-
-
-document
-.getElementById("layer-radars")
-.onchange =
-    e =>
-        e.target.checked
-        ? tracker.radars.addTo(map)
-        : map.removeLayer(
-            tracker.radars
-        );
-
-
-document
-.getElementById("layer-windcone")
-.onchange =
-    e =>
-        e.target.checked
-        ? tracker.radius.addTo(map)
-        : map.removeLayer(
-            tracker.radius
-        );
-
-
-/* LIVE SIMULATION */
-
-liveBtn.onclick =
-    () => {
-
-        stop();
-
-        histBtn.className =
-            "px-3 py-2 rounded-lg text-slate-300 text-xs";
-
-        liveBtn.className =
-            "px-3 py-2 rounded-lg bg-red-600 text-white text-xs";
-
-        feedStatus.textContent =
-            "LIVE SATELLITE FEED (SIMULATED)";
-
-
-        if(liveTimer)
-            clearInterval(
-                liveTimer
+            layers.cyclone.removeLayer(
+                tracker.radius
             );
 
+        }
 
-        liveTimer =
-            setInterval(
-                () => {
-
-                    const last =
-                        data.track[
-                            data.track.length-1
-                        ];
+    }
+);
 
 
-                    const p = {
-
-                        timestamp:
-                            `LIVE +${data.track.length*3}m`,
-
-                        lat:
-                            +(last.lat+.14)
-                            .toFixed(2),
-
-                        lon:
-                            +(last.lon-.07)
-                            .toFixed(2),
-
-                        wind:
-                            Math.max(
-                                55,
-                                Math.min(
-                                    180,
-                                    last.wind +
-                                    (
-                                        Math.random()>.5
-                                        ?5
-                                        :-5
-                                    )
-                                )
-                            ),
-
-                        pressure:
-                            Math.round(
-                                1012 -
-                                last.wind*.36
-                            ),
-
-                        landfallIn:
-                            Math.max(
-                                0,
-                                (last.landfallIn||1)-1
-                            )
-
-                    };
+$("jsonBtn").addEventListener(
+    "click",
+    openJSONModal
+);
 
 
-                    data.track.push(p);
-
-                    configure();
-
-                    renderTrajectory();
-
-                    jump(
-                        data.track.length-1
-                    );
-
-                    addLog(
-                        "⚡ LIVE RADAR FIX RECEIVED",
-                        true
-                    );
-
-                },
-                3200
-            );
-
-    };
+$("closeJson").addEventListener(
+    "click",
+    closeJSONModal
+);
 
 
-histBtn.onclick =
+$("resetJson").addEventListener(
+    "click",
     () => {
 
-        if(liveTimer)
-            clearInterval(
-                liveTimer
-            );
-
-        liveTimer =
-            null;
-
-        histBtn.className =
-            "px-3 py-2 rounded-lg bg-sky-500 text-white text-xs";
-
-        liveBtn.className =
-            "px-3 py-2 rounded-lg text-slate-300 text-xs";
-
-        feedStatus.textContent =
-            "HISTORICAL TIMELINE MODE";
-
-        addLog(
-            "Switched to Historical Timeline."
-        );
-
-    };
-
-
-/* JSON */
-
-jsonBtn.onclick =
-    () => {
-
-        jsonInput.value =
-            JSON.stringify(
-                data,
-                null,
-                2
-            );
-
-        jsonModal.classList.remove(
-            "hidden"
-        );
-
-        jsonModal.classList.add(
-            "flex"
-        );
-
-    };
-
-
-closeJson.onclick =
-    () => {
-
-        jsonModal.classList.add(
-            "hidden"
-        );
-
-        jsonModal.classList.remove(
-            "flex"
-        );
-
-    };
-
-
-resetJson.onclick =
-    () =>
-        jsonInput.value =
+        $("jsonInput").value =
             JSON.stringify(
                 DEFAULT_DATASET,
                 null,
                 2
             );
 
+        $("jsonMessage").textContent =
+            "Sample dataset restored.";
 
-applyJson.onclick =
-    () => {
-
-        try{
-
-            const parsed =
-                JSON.parse(
-                    jsonInput.value
-                );
-
-
-            if(
-                !Array.isArray(
-                    parsed.track
-                )
-                ||
-                !parsed.track.length
-            ){
-
-                throw Error(
-                    "track array is required"
-                );
-
-            }
-
-
-            data =
-                parsed;
-
-            stop();
-
-            renderTrajectory();
-
-            configure();
-
-            closeJson.click();
-
-            addLog(
-                `Imported ${parsed.name || "Custom Storm"}`,
-                true
-            );
-
-        }
-        catch(e){
-
-            alert(
-                "Invalid JSON: "
-                + e.message
-            );
-
-        }
-
-    };
-
-
-logToggle.onclick =
-    () =>
-        log.classList.toggle(
-            "hidden"
-        );
-
-
-/* ================= BACKEND CONNECTION ================= */
-
-function setBadge(text, cls){
-  $("backendBadge").textContent = "BACKEND: " + text;
-  $("backendBadge").className =
-    "text-[10px] px-2 py-1 rounded " + cls;
-}
-
-async function getJSON(path){
-  const r = await fetch(API_BASE_URL + path);
-
-  if(!r.ok){
-    throw Error(`${path} returned ${r.status}`);
-  }
-
-  return r.json();
-}
-
-let routingData = null;
-
-/* ---------- BACKEND LOAD ---------- */
-
-async function loadBackendData(){
-
-  // 1. HEALTH
-  try{
-    await getJSON("/health");
-
-    setBadge(
-      "CONNECTED",
-      "bg-emerald-500/20 text-emerald-300"
-    );
-
-    addLog("Backend connected.", true);
-
-  }catch(e){
-
-    setBadge(
-      "OFFLINE",
-      "bg-red-500/20 text-red-300"
-    );
-
-    $("ai-advisory").textContent =
-      "Backend offline. Start the FastAPI server.";
-
-    addLog(
-      `Backend connection error: ${e.message}`,
-      true
-    );
-
-    return;
-  }
-
-function formatAdvisory(raw){
-
-    if(!raw) return "No advisory available.";
-
-    const lines = raw
-        .split("\n")
-        .map(x => x.trim())
-        .filter(Boolean);
-
-    const risk = [];
-    const infrastructure = [];
-    const actions = [];
-
-    let section = "";
-
-    for(const line of lines){
-
-        const upper = line.toUpperCase();
-
-        if(upper === "RISK DISTRIBUTION"){
-            section = "risk";
-            continue;
-        }
-
-        if(upper === "INFRASTRUCTURE EXPOSURE"){
-            section = "infrastructure";
-            continue;
-        }
-
-        if(upper === "PRIORITY ACTIONS"){
-            section = "actions";
-            continue;
-        }
-
-        if(
-            upper === "MODEL LIMITATIONS" ||
-            upper === "FORECAST SUMMARY"
-        ){
-            section = "";
-            continue;
-        }
-
-        if(section === "risk"){
-            risk.push(line);
-        }
-
-        if(section === "infrastructure"){
-            infrastructure.push(line);
-        }
-
-        if(section === "actions"){
-            actions.push(line);
-        }
     }
+);
 
-    const highRisk =
-        risk.find(x => x.startsWith("High Risk:")) || "";
 
-    const moderateRisk =
-        risk.find(x => x.startsWith("Moderate Risk:")) || "";
-
-    const meanProbability =
-        risk.find(x =>
-            x.startsWith("Mean flood probability:")
-        ) || "";
-
-    const roadExposure =
-        infrastructure.find(x =>
-            x.startsWith("Road exposure:")
-        ) || "";
-
-    const powerExposure =
-        infrastructure.find(x =>
-            x.startsWith("Power infrastructure exposure:")
-        ) || "";
-
-    const usefulActions = actions
-        .filter(x => /^\d+\./.test(x))
-        .slice(0,3);
-
-    return [
-        "RISK SNAPSHOT",
-        `${highRisk} • ${moderateRisk}`,
-        meanProbability,
-
-        "",
-        "INFRASTRUCTURE EXPOSURE",
-        roadExposure,
-        powerExposure,
-
-        "",
-        "PRIORITY ACTIONS",
-        ...usefulActions
-    ]
-    .filter(Boolean)
-    .join("\n");
-}
-
-  // 2. AI ADVISORY
-  try{
-
-    const a = await getJSON("/advisory");
-
-    if(a.error){
-
-      $("ai-advisory").textContent =
-        "No advisory generated yet.";
-
-      addLog(`Advisory: ${a.error}`);
-
-    }else{
-
-      $("ai-advisory").textContent =
-        formatAdvisory(a.advisory);
-
-      addLog(
-        "AI disaster advisory loaded.",
-        true
-      );
-    }
-
-  }catch(e){
-
-    $("ai-advisory").textContent =
-      "Advisory unavailable.";
-
-    addLog(
-      `Advisory error: ${e.message}`
-    );
-  }
-
-
-  // 3. ROUTING
-  try{
-
-    const r = await getJSON("/routing");
-
-    if(r.error){
-
-      addLog(`Routing: ${r.error}`);
-
-    }else{
-
-      routingData = r;
-
-      addLog(
-        "Disaster-aware routing data loaded.",
-        true
-      );
-
-      displayRoutingSummary(r);
-    }
-
-  }catch(e){
-
-    addLog(
-      `Routing error: ${e.message}`
-    );
-  }
-}
-
-
-/* ---------- CONCISE AI ADVISORY ---------- */
-
-function formatAdvisory(raw){
-
-    if(!raw) return "No advisory available.";
-
-    const lines = raw
-        .split("\n")
-        .map(x => x.trim())
-        .filter(Boolean);
-
-    const useful = [];
-
-    for(const line of lines){
-
-        const clean = line
-            .replace(/^[-=*#]+/, "")
-            .trim();
-
-        if(!clean) continue;
-
-        // Skip large report headings
-        if(
-            clean.includes("CYCLONE IMPACT") ||
-            clean.includes("FORECAST SUMMARY") ||
-            clean.includes("FORECASTING PIPELINE")
-        ){
-            continue;
-        }
-
-        // Skip explanatory filler
-        if(
-            clean.startsWith("The forecasting pipeline") ||
-            clean.startsWith("The model") ||
-            clean.startsWith("This analysis")
-        ){
-            continue;
-        }
-
-        useful.push(clean);
-
-        if(useful.length >= 6) break;
-    }
-
-    return useful.join("\n");
-}
-
-
-/* ---------- ROUTING SUMMARY ---------- */
-
-let activeRouteLayer = null;
-let activeRouteStage = null;
-
-function displayRoutingSummary(r){
-
-    if(!r || !r.routes) return;
-
-    routingData = r;
-
-    updateRouteForTime(tracker.index);
-
-    addLog(
-        "Disaster-aware routing loaded.",
-        true
-    );
-}
-
-
-function updateRouteForTime(index){
-
-    if(!routingData || !routingData.routes) return;
-    if(!data || !data.track || !data.track.length) return;
-
-    const point = data.track[index];
-
-    if(!point) return;
-
-    const landfall = Number(point.landfallIn);
-
-    const stages = [48, 24, 12, 6, 0];
-
-    // Select the routing scenario whose
-    // time-to-landfall is closest to the
-    // current cyclone timeline position.
-    let selectedStage = stages[0];
-    let smallestDifference = Infinity;
-
-    for(const stage of stages){
-
-        const difference =
-            Math.abs(stage - landfall);
-
-        if(difference < smallestDifference){
-
-            smallestDifference = difference;
-            selectedStage = stage;
-        }
-    }
-
-    const route =
-        routingData.routes[String(selectedStage)];
-    $("route-stage").textContent =
-        `T-${selectedStage}h`;
-
-    $("route-cost").textContent =
-        Number(route.routing_cost).toFixed(2);
-
-    $("route-change").textContent =
-        `${Number(route.change_percent).toFixed(1)}%`;
-
-    $("routing-status").textContent =
-        "ACTIVE";
-
-    $("routing-note").textContent =
-        `Route updated for cyclone position T-${landfall}h.`;
-
-    if(!route || !Array.isArray(route.path)) return;
-
-    // Remove previous active route.
-    if(window.activeRouteLayer){
-        map.removeLayer(window.activeRouteLayer);
-    }
-
-    const latlngs = route.path.map(
-        point => [Number(point[0]), Number(point[1])]
-    );
-
-    window.activeRouteLayer =
-        L.polyline(
-            latlngs,
-            {
-                weight: 7,
-                opacity: 0.95,
-                interactive: true
-            }
-        ).addTo(map);
-
-    window.activeRouteLayer.bindPopup(`
-        <div style="min-width:180px">
-            <b>DISASTER-AWARE ROUTE</b><br><br>
-            Time to landfall: T-${route.time_to_landfall_h}h<br>
-            Routing cost: ${Number(route.routing_cost).toFixed(2)}<br>
-            Route change: ${Number(route.change_percent).toFixed(1)}%
-        </div>
-    `);
-
-    window.activeRouteStage = selectedStage;
-
-    addLog(
-        `Route: T-${selectedStage}h | Cost ${Number(route.routing_cost).toFixed(2)} | Change ${Number(route.change_percent).toFixed(1)}%`,
-        true
-    );
-}
-
-
-/* ========================================================= */
-/* HUMAN FEEDBACK DASHBOARD */
-/* ========================================================= */
-
-
-const feedbackBtn =
-    document.getElementById(
-        "feedbackBtn"
-    );
-
-
-const feedbackModal =
-    document.getElementById(
-        "feedbackModal"
-    );
-
-
-const closeFeedback =
-    document.getElementById(
-        "closeFeedback"
-    );
-
-
-const submitFeedback =
-    document.getElementById(
-        "submitFeedback"
-    );
-
-
-const feedbackComment =
-    document.getElementById(
-        "feedbackComment"
-    );
-
-
-const charCount =
-    document.getElementById(
-        "charCount"
-    );
-
-
-const feedbackMessage =
-    document.getElementById(
-        "feedbackMessage"
-    );
-
-
-const ratingText =
-    document.getElementById(
-        "ratingText"
-    );
-
-
-const totalFeedback =
-    document.getElementById(
-        "totalFeedback"
-    );
-
-
-const averageSafety =
-    document.getElementById(
-        "averageSafety"
-    );
-
-
-const highImpact =
-    document.getElementById(
-        "highImpact"
-    );
-
-
-const feedbackLocation =
-    document.getElementById(
-        "feedbackLocation"
-    );
-
-
-const feedbackTime =
-    document.getElementById(
-        "feedbackTime"
-    );
-
-
-const feedbackCoords =
-    document.getElementById(
-        "feedbackCoords"
-    );
-
-
-const recentFeedback =
-    document.getElementById(
-        "recentFeedback"
-    );
-
-
-const impactStats =
-    document.getElementById(
-        "impactStats"
-    );
-
-
-const humanSignalBar =
-    document.getElementById(
-        "humanSignalBar"
-    );
-
-
-let selectedRating = 0;
-let userLatitude = null;
-let userLongitude = null;
-
-if ("geolocation" in navigator) {
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-
-            userLatitude = position.coords.latitude;
-            userLongitude = position.coords.longitude;
-
-            console.log(
-                "User location:",
-                userLatitude,
-                userLongitude
-            );
-
-        },
-        (error) => {
-
-            console.warn(
-                "Unable to get user location:",
-                error.message
-            );
-
-        }
-    );
-
-}
-
-/* OPEN DASHBOARD */
-
-feedbackBtn.onclick =
-    () => {
-
-        feedbackModal.classList.add(
-            "active"
-        );
-
-        updateFeedbackDashboard();
-
-        updateFeedbackContext();
-
-    };
-
-
-/* CLOSE DASHBOARD */
-
-closeFeedback.onclick =
-    () => {
-
-        feedbackModal.classList.remove(
-            "active"
-        );
-
-    };
-
-
-feedbackModal.addEventListener(
+$("applyJson").addEventListener(
     "click",
-    e => {
+    applyJSON
+);
 
-        if(
-            e.target === feedbackModal
-        ){
 
-            feedbackModal.classList.remove(
-                "active"
-            );
+$("liveBtn").addEventListener(
+    "click",
+    startSimulation
+);
 
-        }
+
+$("histBtn").addEventListener(
+    "click",
+    () => {
+
+        map.fitBounds(
+            tracker.full?.getBounds() ||
+            [[18,84],[23,89]],
+            {
+                padding:[40,40]
+            }
+        );
 
     }
 );
 
 
-/* ESCAPE TO CLOSE */
+$("runPredictionBtn").addEventListener(
+    "click",
+    runFloodPrediction
+);
 
-document.addEventListener(
-    "keydown",
-    e => {
 
-        if(
-            e.key === "Escape"
-        ){
+/* =========================================================
+   FEEDBACK EVENTS
+========================================================= */
 
-            feedbackModal.classList.remove(
-                "active"
-            );
+$("feedbackBtn").addEventListener(
+    "click",
+    () => {
 
-        }
+        updateFeedbackPosition();
+
+        renderFeedbackDashboard();
+
+        $("feedbackModal").classList.add("show");
 
     }
 );
 
 
-/* STAR RATING */
+$("closeFeedback").addEventListener(
+    "click",
+    () => {
+
+        $("feedbackModal").classList.remove(
+            "show"
+        );
+
+    }
+);
+
 
 document
-.querySelectorAll(".star")
-.forEach(
-    star => {
+    .querySelectorAll(".feedback-star")
+    .forEach(star => {
 
         star.addEventListener(
             "click",
@@ -3546,871 +3463,168 @@ document
 
 
                 document
-                .querySelectorAll(".star")
-                .forEach(
-                    s => {
+                    .querySelectorAll(".feedback-star")
+                    .forEach(item => {
 
-                        const value =
-                            Number(
-                                s.dataset.rating
-                            );
+                        item.classList.toggle(
+                            "active",
+                            Number(item.dataset.rating)
+                            <= selectedRating
+                        );
 
-                        if(
-                            value <= selectedRating
-                        ){
-
-                            s.classList.add(
-                                "active"
-                            );
-
-                        }
-                        else{
-
-                            s.classList.remove(
-                                "active"
-                            );
-
-                        }
-
-                    }
-                );
-
-
-                const ratingLabels = {
-
-                    1:"Very unsafe",
-                    2:"Unsafe",
-                    3:"Moderate",
-                    4:"Mostly safe",
-                    5:"Very safe"
-
-                };
-
-
-                ratingText.textContent =
-                    ratingLabels[
-                        selectedRating
-                    ];
+                    });
 
             }
         );
 
-    }
-);
+    });
 
 
-/* CHARACTER COUNTER */
-
-feedbackComment.addEventListener(
+$("feedbackComment").addEventListener(
     "input",
-    () => {
+    event => {
 
-        charCount.textContent =
-            `${feedbackComment.value.length}/500`;
+        setText(
+            "charCount",
+            `${event.target.value.length}/500`
+        );
 
     }
 );
 
 
-/* GET LOCAL FEEDBACK */
+$("submitFeedback").addEventListener(
+    "click",
+    submitFeedbackLocal
+);
 
-function getFeedback(){
 
-    try{
-
-        return JSON.parse(
-            localStorage.getItem(
-                "cycloneHumanFeedback"
-            )
-        ) || [];
-
-    }
-    catch{
-
-        return [];
-
-    }
-
-}
-
-/* SAVE FEEDBACK */
-
-function saveFeedback(feedback){
-
-    localStorage.setItem(
-        "cycloneHumanFeedback",
-        JSON.stringify(
-            feedback
-        )
-    );
-
-}
-
-
-/* CURRENT MAP CONTEXT */
-
-function updateFeedbackContext(){
-
-    if(
-        !data.track ||
-        !data.track.length
-    ){
-
-        return;
-
-    }
-
-
-    const p =
-        data.track[
-            tracker.index
-        ];
-
-
-    feedbackLocation.textContent =
-        p.timestamp;
-
-
-    feedbackTime.textContent =
-        p.timestamp;
-
-
-    feedbackCoords.textContent =
-        `${p.lat.toFixed(2)}°N, ${p.lon.toFixed(2)}°E`;
-
-}
-
-
-/* SUBMIT FEEDBACK */
-
-submitFeedback.onclick =
-    async () => {
-
-        const impact =
-            document.querySelector(
-                'input[name="impact"]:checked'
-            );
-
-        const severity =
-            document.querySelector(
-                'input[name="severity"]:checked'
-            );
-
-        const comment =
-            feedbackComment.value.trim();
-
-
-        if(!selectedRating){
-
-            showFeedbackMessage(
-                "Please select a safety rating.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        if(!impact){
-
-            showFeedbackMessage(
-                "Please select an impact category.",
-                "error"
-            );
-
-            return;
-
-        }
-
-        if(!severity){
-            showFeedbackMessage(
-                "Please select a severity level.",
-                "error"
-            );
-            
-            return;
-        }
-
-
-        if(!comment){
-
-            showFeedbackMessage(
-                "Please enter a short observation.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const p =
-            data.track[
-                tracker.index
-            ];
-
-        if(userLatitude === null || userLongitude === null){
-            showFeedbackMessage(
-                "Your location could not be determined. Please allow location access and try again.",
-                "error"
-            );
-            return;
-
-}
-
-        const feedback = {
-
-    safety_rating:
-        selectedRating,
-
-    report_type:
-        impact.value,
-
-    severity:
-        severity.value,
-
-    description:
-        comment,
-
-    latitude:
-        userLatitude,
-
-    longitude:
-        userLongitude,
-
-    timestamp:
-        new Date().toISOString(),
-
-    cyclone_time:
-        p.timestamp
-
-};
-
-
-
-
-        try {
-
-        
-    const response =
-        await fetch(
-            "http://127.0.0.1:8000/feedback",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify(feedback)
-            }
-        );
-
-
-    if(!response.ok){
-
-    const errorData =
-        await response.json();
-
-    console.error(
-        "Backend validation error:",
-        errorData
-    );
-
-    
-
-    throw new Error(
-        "Failed to submit feedback"
-    );
-
-}
-
-
-    const result =
-        await response.json();
-
-
-    console.log(
-        "Feedback submitted:",
-        result
-    );
-
-
-    addLog(
-        "👤 Human observation submitted.",
-        true
-    );
-
-
-    showFeedbackMessage(
-        "Observation submitted successfully.",
-        "success"
-    );
-
-
-    resetFeedbackForm();
-    updateFeedbackDashboard();
-
-}
-catch(error){
-
-    console.error(
-        "Feedback submission error:",
-        error
-    );
-
-
-    showFeedbackMessage(
-        "Could not submit observation. Please try again.",
-        "error"
-    );
-
-}
-
-    };
-
-
-/* FEEDBACK MESSAGE */
-
-function showFeedbackMessage(
-    message,
-    type
-){
-
-    feedbackMessage.classList.remove(
-        "hidden"
-    );
-
-    feedbackMessage.className =
-        "mt-3 p-3 rounded-lg text-xs";
-
-
-    if(type === "success"){
-
-        feedbackMessage.classList.add(
-            "bg-emerald-500/10",
-            "border",
-            "border-emerald-500/30",
-            "text-emerald-300",
-            "feedback-success"
-        );
-
-    }
-    else{
-
-        feedbackMessage.classList.add(
-            "bg-red-500/10",
-            "border",
-            "border-red-500/30",
-            "text-red-300"
-        );
-
-    }
-
-
-    feedbackMessage.textContent =
-        message;
-
-
-    setTimeout(
-        () => {
-
-            feedbackMessage.classList.add(
-                "hidden"
-            );
-
-        },
-        3500
-    );
-
-}
-
-
-/* RESET FORM */
-
-function resetFeedbackForm(){
-
-    selectedRating = 0;
-
-
-    document
-    .querySelectorAll(".star")
-    .forEach(
-        s =>
-            s.classList.remove(
-                "active"
-            )
-    );
-
-
-    document
-    .querySelectorAll(
-        'input[name="impact"]'
-    )
-    .forEach(
-        input =>
-            input.checked = false
-    );
-
-
-    feedbackComment.value =
-        "";
-
-
-    charCount.textContent =
-        "0/500";
-
-
-    ratingText.textContent =
-        "Select a safety rating";
-
-}
-
-
-/* UPDATE DASHBOARD */
-
-async function updateFeedbackDashboard(){
-
-    try {
-
-        const response =
-            await fetch(
-                "http://127.0.0.1:8000/feedback"
-            );
-
-
-        if(!response.ok){
-
-            throw new Error(
-                "Failed to fetch feedback"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        const feedbackList =
-            data.feedback || [];
-
-
-        totalFeedback.textContent =
-            feedbackList.length;
-
-
-        if(!feedbackList.length){
-
-            averageSafety.textContent =
-                "—";
-
-            highImpact.textContent =
-                "0";
-
-            humanSignalBar.style.width =
-                "5%";
-
-            renderImpactStats(
-                feedbackList
-            );
-
-            renderRecentFeedback(
-                feedbackList
-            );
-
-            return;
-
-        }
-
-
-        const average =
-            feedbackList.reduce(
-                (sum, item) =>
-                    sum + item.safety_rating,
-                0
-            )
-            /
-            feedbackList.length;
-
-
-        averageSafety.textContent =
-            average.toFixed(1)
-            + "/5";
-
-
-        const highImpactCount =
-            feedbackList.filter(
-                item =>
-                    item.severity === "High" ||
-                    item.severity === "Critical"
-            ).length;
-
-
-        highImpact.textContent =
-            highImpactCount;
-
-
-        const signal =
-            Math.min(
-                100,
-                5 + feedbackList.length * 5
-            );
-
-
-        humanSignalBar.style.width =
-            `${signal}%`;
-
-
-        renderImpactStats(
-            feedbackList
-        );
-
-
-        renderRecentFeedback(
-            feedbackList
-        );
-
-    }
-    catch(error){
-
-        console.error(
-            "Feedback dashboard error:",
-            error
-        );
-
-    }
-
-}
-
-/* IMPACT STATISTICS */
-
-function renderImpactStats(
-    feedbackList
-){
-
-    impactStats.innerHTML =
-        "";
-
-
-    if(!feedbackList.length){
-
-        impactStats.innerHTML = `
-            <div class="text-xs text-slate-500">
-                No impact reports yet.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    const counts = {};
-
-
-    feedbackList.forEach(
-        item => {
-
-            counts[item.report_type] =
-                (counts[item.report_type] || 0)
-                + 1;
-
-        }
-    );
-
-
-    const sorted =
-        Object.entries(counts)
-        .sort(
-            (a,b) =>
-                b[1] - a[1]
-        );
-
-
-    const max =
-        sorted[0][1];
-
-
-    sorted.forEach(
-        ([name,count]) => {
-
-            const percentage =
-                Math.round(
-                    count / max * 100
-                );
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.innerHTML = `
-
-                <div class="flex justify-between text-[10px] mb-1">
-
-                    <span>
-                        ${name}
-                    </span>
-
-                    <span class="text-slate-400">
-                        ${count}
-                    </span>
-
-                </div>
-
-                <div class="h-2 bg-slate-800 rounded-full">
-
-                    <div
-                        class="h-2 bg-sky-500 rounded-full"
-                        style="width:${percentage}%">
-                    </div>
-
-                </div>
-
-            `;
-
-
-            impactStats.appendChild(
-                row
-            );
-
-        }
-    );
-
-}
-
-
-/* RECENT FEEDBACK */
-
-function renderRecentFeedback(
-    feedbackList
-){
-
-    recentFeedback.innerHTML =
-        "";
-
-
-    if(!feedbackList.length){
-
-        recentFeedback.innerHTML = `
-            <div class="text-xs text-slate-500">
-                No observations submitted yet.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    feedbackList
-    .slice(0,8)
-    .forEach(
-        item => {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-
-            div.className =
-                "feedback-item";
-
-
-            const date =
-                new Date(
-                    item.timestamp
-                );
-
-
-            div.innerHTML = `
-
-                <div class="flex justify-between gap-2">
-
-                    <div>
-
-                        <div class="text-xs font-bold text-sky-300">
-
-                            ${escapeHtml(item.report_type)}
-
-                        </div>
-
-                        <div class="text-[10px] text-slate-400 mt-1">
-
-                            ${escapeHtml(item.cyclone_time)}
-                            •
-                            ${escapeHtml(item.severity)}
-
-                        </div>
-
-                    </div>
-
-                    <div class="text-yellow-400 text-xs">
-
-                        ${"★".repeat(item.safety_rating)}
-                        ${"☆".repeat(5-item.safety_rating)}
-
-                    </div>
-
-                </div>
-
-                <div class="text-xs text-slate-300 mt-2">
-
-                    ${escapeHtml(item.description)}
-
-                </div>
-
-                <div class="text-[9px] text-slate-500 mt-2">
-
-                    Location:
-                    ${Number(item.latitude).toFixed(4)},
-                    ${Number(item.longitude).toFixed(4)}
-
-                    <br>
-
-                    Submitted ${date.toLocaleString()}
-
-                </div>
-
-            `;
-
-
-            recentFeedback.appendChild(
-                div
-            );
-
-        }
-    );
-
-}
-
-
-/* BASIC HTML ESCAPING */
-
-function escapeHtml(text){
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.textContent =
-        text;
-
-    return div.innerHTML;
-
-}
-
-
-/* CLEAR LOCAL FEEDBACK */
-
-document
-.getElementById("clearFeedback")
-.onclick =
+$("clearFeedback").addEventListener(
+    "click",
     () => {
 
-        updateFeedbackDashboard();
+        if(
+            confirm(
+                "Clear all locally stored feedback?"
+            )
+        ){
 
-        addLog(
-            "Human feedback dashboard refreshed.",
-            true
-        );
+            localStorage.removeItem(
+                "charybdis_feedback"
+            );
 
-    };
+            renderFeedbackDashboard();
 
+            $("feedbackMessage").textContent =
+                "Local feedback cleared.";
 
-/* INIT */
-
-renderTrajectory();
-
-configure();
-
-async function predictFlood(v){
-
-    const res = await fetch(
-        API_BASE_URL + "/predict",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                elevation: Number(v.elevation),
-                distance_to_coast: Number(v.distance_to_coast),
-                rainfall: Number(v.rainfall),
-                population: Number(v.population),
-                slope: Number(v.slope)
-            })
         }
-    );
 
-    if(!res.ok){
-        throw Error(
-            res.status === 503
-                ? "Flood model unavailable"
-                : `Prediction failed (${res.status})`
+    }
+);
+
+
+/* =========================================================
+   CLOSE MODALS WHEN CLICKING BACKDROP
+========================================================= */
+
+$("jsonModal").addEventListener(
+    "click",
+    event => {
+
+        if(event.target === $("jsonModal")){
+            closeJSONModal();
+        }
+
+    }
+);
+
+
+$("feedbackModal").addEventListener(
+    "click",
+    event => {
+
+        if(event.target === $("feedbackModal")){
+
+            $("feedbackModal")
+                .classList
+                .remove("show");
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE DATA
+========================================================= */
+
+function initializeDataset(){
+
+    tracker.ports =
+        data.infrastructure?.ports || [];
+
+    tracker.shelters =
+        data.infrastructure?.shelters || [];
+
+    tracker.radars =
+        data.infrastructure?.radars || [];
+
+
+    $("timeSlider").max =
+        Math.max(
+            0,
+            data.track.length - 1
         );
-    }
 
-    return res.json();
+    $("timeSlider").value = 0;
+
+
+    renderInfrastructure();
+
+    renderTrajectory();
+
+    updateTelemetry();
+
+    updateFeedbackPosition();
+
 }
 
 
-async function updateFloodPrediction(){
+/* =========================================================
+   INITIALIZE BACKEND
+========================================================= */
 
-    const status = $("flood-model-status");
-    const probability = $("flood-probability");
-    const riskClass = $("flood-risk-class");
-    const note = $("flood-model-note");
+async function initializeBackend(){
 
-    try{
+    await checkBackend();
 
-        status.textContent = "RUNNING";
+    await Promise.all([
+        loadRouting(),
+        loadAdvisory()
+    ]);
 
-        const input = {
-            elevation: 4.5,
-            distance_to_coast: 53.5,
-            rainfall: 126.5,
-            population: 19.0,
-            slope: 0.012
-        };
-
-        const result = await predictFlood(input);
-
-        const pct =
-            (Number(result.flood_probability) * 100).toFixed(1);
-
-        probability.textContent = `${pct}%`;
-
-        riskClass.textContent =
-            result.risk_class === 1
-                ? "HIGH"
-                : "LOW";
-
-        status.textContent = "MODEL ACTIVE";
-
-        note.textContent =
-            "Prediction generated from elevation, coast distance, rainfall, population and slope.";
-
-    }catch(e){
-
-        status.textContent = "UNAVAILABLE";
-
-        note.textContent = e.message;
-
-        console.error("Flood prediction:", e);
-    }
 }
 
-loadBackendData();
-updateFloodPrediction();
-updateFeedbackDashboard();
-updateFeedbackContext();
+
+/* =========================================================
+   START
+========================================================= */
+
+initializeDataset();
+
+initializeBackend();
+
+lucide.createIcons();
+
+window.addEventListener(
+    "resize",
+    () => {
+        map.invalidateSize();
+        drawSpark();
+    }
+);
 
 </script>
 
