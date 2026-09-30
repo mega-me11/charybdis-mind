@@ -2407,24 +2407,68 @@ async function loadRouting(){
    ADVISORY
 ========================================================= */
 
-function formatAdvisory(text){
+function formatAdvisory(raw){
 
-    if(!text){
+    if(!raw){
         return "No advisory available.";
     }
 
-    const clean = String(text).trim();
+    const highRisk =
+        raw.match(/High Risk:\s*([0-9,]+)/)?.[1] || "—";
 
-    if(!clean){
-        return "No advisory available.";
-    }
+    const moderateRisk =
+        raw.match(/Moderate Risk:\s*([0-9,]+)/)?.[1] || "—";
 
-    return escapeHTML(clean)
-        .replace(/\n\n+/g,"<br><br>")
-        .replace(/\n/g,"<br>");
+    const meanProbability =
+        raw.match(/Mean flood probability:\s*([0-9.]+)/)?.[1] || "—";
 
+    const roadExposure =
+        raw.match(/Road exposure:\s*([0-9.]+%)/)?.[1] || "—";
+
+    const powerExposure =
+        raw.match(/Power infrastructure exposure:\s*([0-9.]+%)/)?.[1] || "—";
+
+    return `
+        <div class="space-y-3">
+
+            <div>
+                <div class="text-[10px] font-bold text-sky-300 mb-1">
+                    RISK SNAPSHOT
+                </div>
+
+                <div class="text-xs">
+                    🔴 High Risk: <b>${highRisk}</b><br>
+                    🟡 Moderate Risk: <b>${moderateRisk}</b><br>
+                    Mean flood probability: <b>${meanProbability}</b>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-sky-300 mb-1">
+                    INFRASTRUCTURE EXPOSURE
+                </div>
+
+                <div class="text-xs">
+                    🛣️ Roads exposed: <b>${roadExposure}</b><br>
+                    ⚡ Power infrastructure: <b>${powerExposure}</b>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-sky-300 mb-1">
+                    PRIORITY ACTIONS
+                </div>
+
+                <div class="text-xs leading-relaxed">
+                    • Monitor high-risk zones<br>
+                    • Flag exposed roads for emergency routing<br>
+                    • Inspect exposed power infrastructure
+                </div>
+            </div>
+
+        </div>
+    `;
 }
-
 
 async function loadAdvisory(){
 
