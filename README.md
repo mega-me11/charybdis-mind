@@ -402,7 +402,7 @@ The timeline architecture is designed so that sample cyclone data can eventually
 
 ### Megha Chatterjee (Team Lead) — Geospatial Intelligence • Machine Learning • Routing • Backend • AI Integration • Human Feedback**
 
-### Jaspreet Kaur — Cyclone Timeline •  Map Interaction • Unified Dashboard UI
+### Jaspreet Kaur — Cyclone Timeline •  Map Interaction • Unified Dashboard UI • Deployment
 
 ### Ekta Bokaria — Ground Infrastructure • Map Layers • Unified Dashboard UI
 
